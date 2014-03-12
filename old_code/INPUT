@@ -1,0 +1,25 @@
+kappa_C   0.12
+kappa_X   0.12
+delta     0.0
+Lz        1
+k_p       1.394
+k_pb      -0.2
+omega_p   -0.2
+omega_pb  -0.7561
+sigma_p   40.0
+sigma_pb  5.0
+sigma_t   3.0
+t_init    2000.0
+f_p       0.11
+f_pb      0.11
+assymx    -7.0
+assymy    -6.00
+mom_cent  -0.2
+mom_cut   0.60
+Lx        70.00
+Ly        70.00
+Nx even   256
+Ny even   256
+tot_h     8000.00
+dxsav     40.0
+eps_r     0.00001

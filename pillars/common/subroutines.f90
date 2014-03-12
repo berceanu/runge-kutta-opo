@@ -1,0 +1,574 @@
+Module subroutines
+  USE global
+  IMPLICIT NONE
+  SAVE
+CONTAINS
+
+  Subroutine read
+    IMPLICIT NONE
+
+    OPEN(UNIT=22,FILE='INPUT',STATUS='old')
+    READ(22,NML=indata)
+    CLOSE(22)
+    
+    ax=2.0*Lx/Nx    
+    ay=2.0*Ly/Ny    
+    norm=ax*ay    
+    f_p=f_p*256/sqrt(Nx*Ny*1.0)*sqrt(Lx*Ly*1.0)/70    
+
+  end Subroutine read
+
+  SUBROUTINE  init_pdb
+    IMPLICIT NONE
+    
+    integer :: ix, iy
+    real  :: sx, sy  
+    real :: re_y1, im_y1, re_y2, im_y2
+  
+    open(unit=22, file="phcplx-opo_spc"//trim(adjustl(label))//".dat", status='old')    
+    read(22, fmt=' ("#", 1x, "x", 12x, "y", 12x, "real(psi(1))", 1x, "aimag(psi(1))") ')    
+    open(unit=23, file="excplx-opo_spc"//trim(adjustl(label))//".dat", status='old')    
+    read(23, fmt=' ("#", 1x, "x", 12x, "y", 12x, "real(psi(2))", 1x, "aimag(psi(2))") ')    
+    do iy=1, Ny    
+       do ix=1, Nx    
+          read(22, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx, sy, re_y1, im_y1
+          read(23, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx, sy, re_y2, im_y2
+        
+          pdb(ix,iy,1)=&    
+               (1.0,0.0)*re_y1*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70+&    
+               (0.0,1.0)*im_y1*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70    
+          pdb(ix,iy,2)=&    
+               (1.0,0.0)*re_y2*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70+&    
+               (0.0,1.0)*im_y2*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70    
+      end do    
+       read(22,*)    
+       read(23,*)    
+    end do    
+    close(22)    
+    close(23)
+
+  END SUBROUTINE  init_pdb
+  Subroutine init_pillar
+    implicit none
+    
+    integer :: ix, iy
+    real :: sx, sy
+    
+    open(unit=23, file='potential.dat', status='replace')
+    pot_c=0.0
+    kappaC = kappa_out
+    kappaX = kappa_out
+    do iy=1, Ny
+      sy=-Ly+(iy-1)*ay
+      do ix=1, Nx
+        sx=-Lx+(ix-1)*ax
+        pot_c(ix,iy) = g_pot*(1.0+0.5*&
+                      ( tanh((1.0/2.0)*( sqrt(sx*sx+sy*sy)-r_pillar ))-&
+                        tanh((1.0/2.0)*( sqrt(sx*sx+sy*sy)+r_pillar ))&
+                        ))
+        write(23,*) sx, sy, pot_c(ix,iy)
+        if (sqrt(sx**2 + sy**2) .lt. abs(r_pillar)) then
+          pot_c(ix,iy)=0
+          kappaC(ix,iy) = kappa_C
+          kappaX(ix,iy) = kappa_X
+        end if
+      end do
+      write(23,*)
+    end do
+    close(23)
+    pot_x=pot_c
+    
+  end Subroutine init_pillar
+  
+  Subroutine init_pot_c
+    implicit none
+
+    integer :: ix, iy
+
+    ix = (def_x_pos+Lx)/ax + 1
+    iy = (def_y_pos+Ly)/ay + 1
+    !for old coordinates of (128,128) set def_x_pos = -ax, def_y_pos=-ay
+
+    pot_c = 0.0
+    pot_c(ix,iy)=gv
+
+  end Subroutine init_pot_c
+
+  SUBROUTINE  init_pump_th
+    IMPLICIT NONE
+    
+    integer :: ix, iy
+    real  :: sx, sy  
+		
+    !top hat pump    
+    open(unit=25, file='pump.dat', status='replace')    
+    do iy=1, Ny    
+       sy=-Ly+(iy-1)*ay    
+       do ix=1, Nx    
+          sx=-Lx+(ix-1)*ax    
+          pump_spatial(ix,iy)=f_p*0.5*&    
+               ( tanh((1.0/10.0)*( sqrt(sx*sx+sy*sy)+sigma_p ))-&    
+               tanh((1.0/10.0)*( sqrt(sx*sx+sy*sy)-sigma_p )) ) + (0.0,0.0)    
+          write(25,*) sx, sy, abs(pump_spatial(ix,iy))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70    
+       end do    
+       write(25,*)    
+    end do    
+    close(25)
+        
+    do iy=1, Ny    
+       !sy=-Ly+(iy-1)*ay    
+       do ix=1, Nx    
+          sx=-Lx+(ix-1)*ax    
+          pump_spatial(ix,iy)= pump_spatial(ix,iy)*cos(k_p*sx)+(0.0,1.0)*pump_spatial(ix,iy)*sin(k_p*sx)    
+       end do    
+    end do
+
+  END SUBROUTINE  init_pump_th
+
+  SUBROUTINE  init_pump_homo
+    IMPLICIT NONE
+    
+    integer :: ix, iy
+    real  :: sx, sy  
+
+    !homogeneous pumping		
+    open(unit=25, file='pump.dat', status='replace')    
+    do iy=1, Ny    
+       sy=-Ly+(iy-1)*ay    
+       do ix=1, Nx    
+          sx=-Lx+(ix-1)*ax    
+          pump_spatial(ix,iy)=f_p + (0.0,0.0)    
+          write(25,*) sx, sy, abs(pump_spatial(ix,iy))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70    
+       end do    
+       write(25,*)    
+    end do    
+    close(25)    
+        
+    do iy=1, Ny    
+       !sy=-Ly+(iy-1)*ay    
+       do ix=1, Nx    
+          sx=-Lx+(ix-1)*ax    
+          pump_spatial(ix,iy)= pump_spatial(ix,iy)*cos(k_p*sx)+(0.0,1.0)*pump_spatial(ix,iy)*sin(k_p*sx)    
+       end do    
+    end do
+
+  END SUBROUTINE  init_pump_homo
+
+  Subroutine setg
+    implicit none        
+    integer :: j,k    
+        
+    DO j=1,(Ny/2+1)    
+       DO k=1,(Nx/2+1)    
+          kinetic(k,j)=pi*pi*(&    
+               &(k-1)*(k-1)/(Lx*Lx)+(j-1)*(j-1)/(Ly*Ly))    
+       END DO    
+    END DO    
+    DO j=(Ny/2+2),Ny    
+       DO k=(Nx/2+2),Nx    
+          kinetic(k,j)=pi*pi*( &    
+               & (k-1-Nx)*(k-1-Nx)/(Lx*Lx)+(j-1-Ny)*(j-1-Ny)/(Ly*Ly))    
+       END DO    
+    END DO    
+    DO j=1,(Ny/2+1)    
+       DO k=(Nx/2+2),Nx    
+          kinetic(k,j)=pi*pi*(&    
+               &(k-1-Nx)*(k-1-Nx)/(Lx*Lx)+(j-1)*(j-1)/(Ly*Ly))    
+       END DO    
+    END DO    
+    DO j=(Ny/2+2),Ny    
+       DO k=1,(Nx/2+1)      
+          kinetic(k,j)=pi*pi*(&    
+               &(k-1)*(k-1)/(Lx*Lx)+(j-1-Ny)*(j-1-Ny)/(Ly*Ly))    
+       END DO    
+    END DO    
+
+  end subroutine setg
+
+  Subroutine export_evolution	  
+	implicit none  
+    integer :: i_t    
+    integer :: kx, ky    
+  
+    real :: omega    
+    real :: mom_x, mom_y    
+  
+    !export y_tot_0 to file!!    
+    open(unit=28, file="spectr_om-vs-k_no-trigg.dat", status='replace')    
+    write(28, fmt=' ("#", 1x, "mom_x", 12x, "mom_y", 12x, "omega", 12x, "real(y_tot_0)", 1x, "aimag(y_tot_0)") ')         
+  
+    do i_t=Nt/2+2, Nt    
+       omega=2.0*pi*(i_t-1-Nt)/( (Nt-1)*dxsav_sp )    
+	     do ky=Ny/2+2, Ny  
+          mom_y=pi*(ky-1-Ny)/Ly    
+          do kx=Nx/2+2, Nx    
+             mom_x=pi*(kx-1-Nx)/Lx    
+             write(28,100) mom_x, mom_y, -omega, real(y_tot_0(kx,ky,i_t)), aimag(y_tot_0(kx,ky,i_t))    
+          end do    
+          do kx=1, Nx/2+1    
+             mom_x=pi*(kx-1)/Lx    
+             write(28,100) mom_x, mom_y, -omega, real(y_tot_0(kx,ky,i_t)), aimag(y_tot_0(kx,ky,i_t))    
+          end do    
+       end do    
+       do ky=1, Ny/2+1    
+          mom_y=pi*(ky-1)/Ly    
+          do kx=Nx/2+2, Nx    
+             mom_x=pi*(kx-1-Nx)/Lx    
+             write(28,100) mom_x, mom_y, -omega, real(y_tot_0(kx,ky,i_t)), aimag(y_tot_0(kx,ky,i_t))    
+          end do    
+          do kx=1, Nx/2+1    
+             mom_x=pi*(kx-1)/Lx    
+             write(28,100) mom_x, mom_y, -omega, real(y_tot_0(kx,ky,i_t)), aimag(y_tot_0(kx,ky,i_t))    
+          end do    
+    end do    
+    end do    
+    do i_t=1, Nt/2+1    
+       omega=2.0*pi*(i_t-1)/( (Nt-1)*dxsav_sp )    
+	     do ky=Ny/2+2, Ny  
+          mom_y=pi*(ky-1-Ny)/Ly    
+          do kx=Nx/2+2, Nx    
+             mom_x=pi*(kx-1-Nx)/Lx    
+             write(28,100) mom_x, mom_y, -omega, real(y_tot_0(kx,ky,i_t)), aimag(y_tot_0(kx,ky,i_t))    
+          end do    
+          do kx=1, Nx/2+1    
+             mom_x=pi*(kx-1)/Lx    
+             write(28,100) mom_x, mom_y, -omega, real(y_tot_0(kx,ky,i_t)), aimag(y_tot_0(kx,ky,i_t))    
+          end do    
+       end do    
+       do ky=1, Ny/2+1    
+          mom_y=pi*(ky-1)/Ly    
+          do kx=Nx/2+2, Nx    
+             mom_x=pi*(kx-1-Nx)/Lx    
+             write(28,100) mom_x, mom_y, -omega, real(y_tot_0(kx,ky,i_t)), aimag(y_tot_0(kx,ky,i_t))    
+          end do    
+          do kx=1, Nx/2+1    
+             mom_x=pi*(kx-1)/Lx    
+             write(28,100) mom_x, mom_y, -omega, real(y_tot_0(kx,ky,i_t)), aimag(y_tot_0(kx,ky,i_t))    
+          end do    
+    end do    
+    end do    
+    close(28)                
+  
+    100 format (5(1x, d12.5))	  
+  end Subroutine export_evolution    
+
+  Subroutine import_evolution
+    implicit none  
+    integer :: i_t    
+    integer :: kx, ky    
+  
+    real :: re_y_tot_0, im_y_tot_0    
+    real :: omega    
+    real :: mom_x, mom_y
+  
+    y_tot_0=(0.0,0.0)    
+  
+    !!importing y_tot_0!!    
+    open(unit=28, file="spectr_om-vs-k_no-trigg.dat", status='old')    
+    read(28, fmt=' ("#", 1x, "mom_x", 12x, "mom_y", 12x, "omega", 12x, "real(y_tot_0)", 1x, "aimag(y_tot_0)") ')         
+
+    do i_t=Nt, 1, -1    
+       do ky=Ny/2+2, Ny  
+          do kx=Nx/2+2, Nx    
+             read(28,101) mom_x, mom_y, omega, re_y_tot_0, im_y_tot_0    
+             y_tot_0(kx,ky,i_t)=(1.0,0.0)*re_y_tot_0+(0.0,1.0)*im_y_tot_0    
+          end do    
+          do kx=1, Nx/2+1    
+             read(28,101) mom_x, mom_y, omega, re_y_tot_0, im_y_tot_0    
+             y_tot_0(kx,ky,i_t)=(1.0,0.0)*re_y_tot_0+(0.0,1.0)*im_y_tot_0    
+          end do    
+       end do    
+       do ky=1, Ny/2+1    
+          do kx=Nx/2+2, Nx    
+             read(28,101) mom_x, mom_y, omega, re_y_tot_0, im_y_tot_0    
+             y_tot_0(kx,ky,i_t)=(1.0,0.0)*re_y_tot_0+(0.0,1.0)*im_y_tot_0    
+          end do    
+          do kx=1, Nx/2+1    
+             read(28,101) mom_x, mom_y, omega, re_y_tot_0, im_y_tot_0    
+             y_tot_0(kx,ky,i_t)=(1.0,0.0)*re_y_tot_0+(0.0,1.0)*im_y_tot_0    
+          end do    
+       end do    
+    end do    
+       
+    close(28)                        
+	  
+	101 format (5(1x, d12.5))  
+  end Subroutine import_evolution    
+
+  Subroutine eval_spectr_0
+    implicit none    
+    integer :: i_t    
+    integer :: kx, ky    
+    real :: omega    
+    real :: mom_x, mom_y    
+    
+	!full spectum	
+    open(unit=23, file="spectr_om-vs-kx_no-trigg.dat", status='replace')    
+    write(23, fmt=' ("#", 1x, "mom_x", 19x, "omega", 19x, "abs(psi(1))**2") ')    
+    do i_t=Nt/2+2, Nt    
+       omega=2.0*pi*(i_t-1-Nt)/( (Nt-1)*dxsav_sp )    
+       do kx=Nx/2+2, Nx    
+          mom_x=pi*(kx-1-Nx)/Lx    
+          write(23, *) mom_x, -omega, abs(y_tot_0(kx,1,i_t))*abs(y_tot_0(kx,1,i_t))    
+       end do    
+       do kx=1, Nx/2+1    
+          mom_x=pi*(kx-1)/Lx    
+          write(23, *) mom_x, -omega, abs(y_tot_0(kx,1,i_t))*abs(y_tot_0(kx,1,i_t))    
+       end do    
+       write(23,*)    
+    end do    
+    do i_t=1, Nt/2+1    
+       omega=2.0*pi*(i_t-1)/( (Nt-1)*dxsav_sp )    
+       do kx=Nx/2+2, Nx    
+          mom_x=pi*(kx-1-Nx)/Lx    
+          write(23, *) mom_x, -omega, abs(y_tot_0(kx,1,i_t))*abs(y_tot_0(kx,1,i_t))    
+       end do    
+       do kx=1, Nx/2+1    
+          mom_x=pi*(kx-1)/Lx    
+          write(23, *) mom_x, -omega, abs(y_tot_0(kx,1,i_t))*abs(y_tot_0(kx,1,i_t))    
+       end do    
+       write(23,*)    
+    end do    
+    close(23)    
+  
+	!integrated spectrum	
+    open(unit=24, file="int-spectr_no-trigg.dat", status='replace')    
+    write(24, fmt=' ("#", 1x, "omega", 20x, "int_omega") ')    
+    int_sp=sum(sum(abs(y_tot_0), dim=1), dim=1)    
+    do i_t=Nt/2+2, Nt    
+       omega=2.0*pi*(i_t-1-Nt)/( (Nt-1)*dxsav_sp )    
+       write(24, *) -omega, int_sp(i_t)    
+    end do    
+    do i_t=1, Nt/2+1    
+       omega=2.0*pi*(i_t-1)/( (Nt-1)*dxsav_sp )    
+       write(24, *) -omega, int_sp(i_t)    
+    end do    
+    close(24)    
+                
+  end Subroutine eval_spectr_0    
+
+  Subroutine filter_peak(omega, omega_cut, lbl)
+    implicit none    
+      
+    real, intent (in) :: omega, omega_cut
+	character(len=*), intent (in) :: lbl	
+		
+    integer :: i_t, num
+    integer :: i_tmax, i_tmax_i, i_tmax_f
+
+    real :: omega_i, omega_f    
+      
+	write(*,*) trim(adjustl(lbl))	
+	write(*,*) 'omega= ', omega	
+		
+    !find index of peak 
+    i_tmax = 1 + Nt/2 + omega/(2.0*pi) * (Nt-1)*dxsav_sp     
+    if ( (i_tmax.lt.1) .OR. (i_tmax.gt.Nt) ) &    
+		write(*,*) "index of "//trim(adjustl(lbl))//" peak out of range!"	
+		
+    !calculating indices of energy window
+	omega_i = omega - omega_cut	
+    write(*,*) 'omega_i= ', omega_i    
+	i_tmax_i = 1 + Nt/2 + omega_i/(2.0*pi) * (Nt-1)*dxsav_sp 	
+    if ( (i_tmax_i.lt.1) .OR. (i_tmax_i.gt.Nt) ) &    
+		write(*,*) "L index of "//trim(adjustl(lbl))//" out of range!"	
+		
+	omega_f = omega + omega_cut	
+    write(*,*) 'omega_f= ', omega_f    
+	i_tmax_f = 1 + Nt/2 + omega_f/(2.0*pi) * (Nt-1)*dxsav_sp 	
+    if ( (i_tmax_f.lt.1) .OR. (i_tmax_f.gt.Nt) ) &    
+		write(*,*) "R index of "//trim(adjustl(lbl))//" out of range!"	
+		
+    !integrate in energy
+    write(*,*) 'i_tmax_i= ', i_tmax_i    
+    write(*,*) 'i_tmax_f= ', i_tmax_f    
+    write(*,*)    
+        
+    y_enfilt=(0.0,0.0)
+    
+    if ((i_tmax_f-i_tmax_i).eq.1) i_tmax_i=i_tmax_f     
+
+    do i_t=i_tmax_i, i_tmax_f    
+       y_enfilt(:,:)=y_enfilt(:,:) + y_tot_0(:,:,i_t)    
+    end do    
+      
+    !normalize
+    num = i_tmax_f - i_tmax_i + 1    
+	y_enfilt(:,:)=y_enfilt(:,:)/num	
+
+  end Subroutine filter_peak
+
+  Subroutine write_kx_max(lbl) 
+    implicit none    
+	character(len=*), intent (in) :: lbl	
+    
+    real :: mom_x_max
+    
+    !write kx of maximum peak emission
+    kx_max=maxloc( abs(y_enfilt(:,1)) )    
+    if ( kx_max(1).ge.Nx/2+2 ) mom_x_max=pi*(kx_max(1)-1-Nx)/Lx    
+    if ( kx_max(1).le.Nx/2+1 ) mom_x_max=pi*(kx_max(1)-1)/Lx    
+    write(25,*) "mom_x_max_"//trim(adjustl(lbl))//"= ", mom_x_max    
+
+  end Subroutine write_kx_max
+
+  Subroutine write_peak_mom(lbl)
+    implicit none    
+	character(len=*), intent (in) :: lbl	
+    
+	integer :: kx, ky	
+    real :: mom_x, mom_y
+  
+    !write peak emission in momentum
+    open(unit=27, file="opo_ph-mom_enfilt_"//trim(adjustl(lbl))//".dat", status='replace')    
+    write(27, fmt=' ("#", 1x, "kx", 12x, "ky", 12x, "|psi(1)|^2") ')    
+    do ky=Ny/2+2, Ny    
+       mom_y=pi*(ky-1-Ny)/Ly    
+       do kx=Nx/2+2, Nx    
+          mom_x=pi*(kx-1-Nx)/Lx    
+          write(27,*) mom_x, mom_y, &    
+               abs(y_enfilt(kx,ky))*abs(y_enfilt(kx,ky))    
+       end do    
+       do kx=1, Nx/2+1    
+          mom_x=pi*(kx-1)/Lx    
+          write(27,*) mom_x, mom_y, &    
+               abs(y_enfilt(kx,ky))*abs(y_enfilt(kx,ky))    
+       end do    
+       write(27,*)    
+    end do    
+    do ky=1, Ny/2+1    
+       mom_y=pi*(ky-1)/Ly    
+       do kx=Nx/2+2, Nx    
+          mom_x=pi*(kx-1-Nx)/Lx    
+          write(27,*) mom_x, mom_y, &    
+               abs(y_enfilt(kx,ky))*abs(y_enfilt(kx,ky))    
+       end do    
+       do kx=1, Nx/2+1    
+          mom_x=pi*(kx-1)/Lx    
+          write(27,*) mom_x, mom_y, &    
+               abs(y_enfilt(kx,ky))*abs(y_enfilt(kx,ky))    
+       end do    
+       write(27,*)    
+    end do    
+    close(27)    
+
+  end Subroutine write_peak_mom
+  
+  Subroutine write_peak_spc(lbl)
+    implicit none      
+	character(len=*), intent (in) :: lbl	
+    
+	integer :: ix, iy
+    real :: sx, sy
+	
+    !write peak emission in space    
+    open(unit=26, file="opo_ph-spc_enfilt_"//trim(adjustl(lbl))//".dat", status='replace')    
+    write(26, fmt=' ("#", 1x, "x", 12x, "y", 12x, "|psi(1)|^2") ')    
+    do iy=1, Ny    
+       sy=-Ly+(iy-1)*ay    
+       do ix=1, Nx    
+          sx=-Lx+(ix-1)*ax    
+          write(26,*) sx, sy, abs(y_enfilt(ix,iy))*abs(y_enfilt(ix,iy))    
+       end do    
+       write(26,*)    
+    end do    
+    close(26)    
+
+  end Subroutine write_peak_spc
+  
+  Subroutine mom_filter
+    implicit none    
+    integer :: kx, ky    
+    real :: mom_x, mom_y    
+  
+    wave_f_flt=(0.0,0.0)    
+    do ky=Ny/2+2, Ny    
+       mom_y=pi*(ky-1-Ny)/Ly    
+       do kx=Nx/2+2, Nx    
+          mom_x=pi*(kx-1-Nx)/Lx    
+          if( sqrt((mom_x-mom_cent)*(mom_x-mom_cent)+mom_y*mom_y) .le. mom_cut ) then    
+             wave_f_flt(kx,ky,1) = wave_f_mom(kx,ky,1)    
+          end if    
+       end do    
+       do kx=1, Nx/2+1    
+          mom_x=pi*(kx-1)/Lx    
+          if( sqrt((mom_x-mom_cent)*(mom_x-mom_cent)+mom_y*mom_y) .le. mom_cut ) then    
+             wave_f_flt(kx,ky,1) = wave_f_mom(kx,ky,1)    
+          end if    
+       end do    
+    end do    
+    do ky=1, Ny/2+1    
+       mom_y=pi*(ky-1)/Ly    
+       do kx=Nx/2+2, Nx    
+          mom_x=pi*(kx-1-Nx)/Lx    
+          if( sqrt((mom_x-mom_cent)*(mom_x-mom_cent)+mom_y*mom_y) .le. mom_cut ) then    
+             wave_f_flt(kx,ky,1) = wave_f_mom(kx,ky,1)    
+          end if    
+       end do    
+       do kx=1, Nx/2+1    
+          mom_x=pi*(kx-1)/Lx    
+          if( sqrt((mom_x-mom_cent)*(mom_x-mom_cent)+mom_y*mom_y) .le. mom_cut ) then    
+             wave_f_flt(kx,ky,1) = wave_f_mom(kx,ky,1)    
+          end if    
+       end do    
+    end do    
+
+  end Subroutine mom_filter    
+
+  Subroutine write_momentum
+    implicit none    
+    integer :: kx, ky    
+    real :: mom_x, mom_y    
+  
+    open(unit=24, file="opo_mom_ph"//trim(adjustl(label))//".dat", status='replace')    
+    write(24, fmt=' ("#", 1x, "kx", 12x, "ky", 12x, "|psi(1)|^2") ')    
+    do ky=Ny/2+2, Ny    
+       mom_y=pi*(ky-1-Ny)/Ly    
+       do kx=Nx/2+2, Nx    
+          mom_x=pi*(kx-1-Nx)/Lx    
+          write(24,*) mom_x, mom_y,&    
+               abs(wave_f_mom(kx,ky,1))*abs(wave_f_mom(kx,ky,1))    
+       end do    
+       do kx=1, Nx/2+1    
+          mom_x=pi*(kx-1)/Lx    
+          write(24,*) mom_x, mom_y,&    
+               abs(wave_f_mom(kx,ky,1))*abs(wave_f_mom(kx,ky,1))    
+       end do    
+       write(24,*)    
+    end do    
+    do ky=1, Ny/2+1    
+       mom_y=pi*(ky-1)/Ly    
+       do kx=Nx/2+2, Nx    
+          mom_x=pi*(kx-1-Nx)/Lx    
+          write(24,*) mom_x, mom_y,&    
+               abs(wave_f_mom(kx,ky,1))*abs(wave_f_mom(kx,ky,1))    
+       end do    
+       do kx=1, Nx/2+1    
+          mom_x=pi*(kx-1)/Lx    
+          write(24,*) mom_x, mom_y,&    
+               abs(wave_f_mom(kx,ky,1))*abs(wave_f_mom(kx,ky,1))    
+       end do    
+       write(24,*)    
+    end do    
+    close(24)    
+  
+	!write cut in momentum
+    open(unit=25, file="cutky0opo_mom_ph"//trim(adjustl(label))//".dat", status='replace')    
+    write(25, fmt=' ("#", 1x, "kx", 12x, "ky", 12x, "|psi(1)|^2") ')    
+    ky=1    
+    mom_y=pi*(ky-1)/Ly    
+    do kx=Nx/2+2, Nx    
+       mom_x=pi*(kx-1-Nx)/Lx    
+       write(25,*) mom_x, mom_y,&    
+            abs(wave_f_mom(kx,ky,1))*abs(wave_f_mom(kx,ky,1))    
+    end do    
+    do kx=1, Nx/2+1    
+       mom_x=pi*(kx-1)/Lx    
+       write(25,*) mom_x, mom_y,&    
+            abs(wave_f_mom(kx,ky,1))*abs(wave_f_mom(kx,ky,1))    
+    end do    
+    close(25)    
+
+  end Subroutine write_momentum    
+
+end Module subroutines
