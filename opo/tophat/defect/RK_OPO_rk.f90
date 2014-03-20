@@ -18,7 +18,7 @@
         call nag_fft_trig(trig_x)
         call nag_fft_trig(trig_y)
 
-		!initialize photon potential
+	!initialize photon potential
         call init_pot_c
         
         !initialize wf
