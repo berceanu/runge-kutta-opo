@@ -52,29 +52,16 @@ CONTAINS
   Subroutine init_pot_c_t
     implicit none
 
-    integer :: d, sps
-    integer :: idx, indstx, indenx, indy, t
+    integer :: indx, indy, t
 
     pot_c_t = 0.0
 
-    indstx = (-ax+startx+Lx)/ax + 1
-    indenx = (-ax+endx+Lx)/ax + 1
-    indy = (-ay+Ly)/ay + 1
+    indx = (def_x_pos+Lx)/ax + 1
+    indy = (def_y_pos+Ly)/ay + 1
+    !for old coordinates of (Nx/2,Ny/2) set def_x_pos = -ax, def_y_pos=-ay
 
-    sps = ax/v
-    !d = startx - endx
-
-    do t=1, t_stfft
-        pot_c_t(indstx,indy,t)=gv
-    end do
-
-    t=t_stfft
-    idx=indstx
-    do !while t <= tot_h
-        t=t+1
-        if (.not.(t<=tot_h)) exit
-        if (mod(t-t_stfft,sps)==0) idx=idx-1
-        pot_c_t(idx,indy,t)=gv
+    do t=1, tot_h
+        pot_c_t(indx,indy,t)=gv
     end do
 
   end Subroutine init_pot_c_t
@@ -291,6 +278,7 @@ CONTAINS
                i_tmax_p, i_tmax_s, i_tmax_i, omega_pmax, omega_smax, omega_imax
 
     call resolve_signal
+    call resolve_signal_in_mom
 
   end Subroutine eval_spectr
 
@@ -323,7 +311,6 @@ CONTAINS
        !write the signal en-filtered wf in space
        open(unit=26, file="opo_ph-spcenfilt_signal"//trim(adjustl(label))//".dat", status='replace')
        write(26, fmt=' ("#", 1x, "x", 12x, "y", 12x, "|psi(1)|^2") ')
-
        do iy=1, Ny
           sy=-Ly+(iy-1)*ay
           do ix=1, Nx
@@ -339,5 +326,69 @@ CONTAINS
 
   end Subroutine resolve_signal
 
+  Subroutine resolve_signal_in_mom
+    use nag_fft, only: nag_fft_1d, nag_fft_trig
+    implicit none
+
+    integer :: i_t, j_t, i, j
+    integer :: kx, ky
+    real :: mom_x, mom_y
+
+    j_t=0
+    do i_t=i_tmax_s(1)-Nredt, i_tmax_s(1)+Nredt
+       if(( i_t.gt.Nt ).or.( i_t.lt.1 ))&
+         write(*,*) 'signal filter index out of range!'
+       j_t=j_t+1
+       y_enfilt(:,:,j_t)=y_tot(:,:,i_t)
+    end do
+
+    do i=1, Nx
+        do j=1, Ny
+                y_enfilt(i,j,:)=nag_fft_1d(y_enfilt(i,j,:), inverse=.true., trig = trig_redt)    
+        end do
+    end do
+
+
+    !time_kount=1 defined at the beginning of the programme
+    do j_t=1, 2*Nredt+1
+
+       write(label,FMT="(i3)") time_kount
+       open(unit=27, file="opo_ph-momenfilt_signal"//trim(adjustl(label))//".dat", status='replace')    
+       write(27, fmt=' ("#", 1x, "kx", 12x, "ky", 12x, "|psi(1)|^2") ')    
+
+       do ky=Ny/2+2, Ny    
+          mom_y=pi*(ky-1-Ny)/Ly    
+          do kx=Nx/2+2, Nx    
+             mom_x=pi*(kx-1-Nx)/Lx    
+             write(27,*) mom_x, mom_y, &    
+                  abs(y_enfilt(kx,ky,j_t))**2
+          end do    
+          do kx=1, Nx/2+1    
+             mom_x=pi*(kx-1)/Lx    
+             write(27,*) mom_x, mom_y, &    
+                  abs(y_enfilt(kx,ky,j_t))**2
+          end do    
+          write(27,*)    
+       end do    
+       do ky=1, Ny/2+1    
+          mom_y=pi*(ky-1)/Ly    
+          do kx=Nx/2+2, Nx    
+             mom_x=pi*(kx-1-Nx)/Lx    
+             write(27,*) mom_x, mom_y, &    
+                  abs(y_enfilt(kx,ky,j_t))**2
+          end do    
+          do kx=1, Nx/2+1    
+             mom_x=pi*(kx-1)/Lx    
+             write(27,*) mom_x, mom_y, &    
+                  abs(y_enfilt(kx,ky,j_t))**2
+          end do    
+          write(27,*)    
+       end do    
+       close(27)    
+
+       time_kount=time_kount+1
+    end do
+
+  end Subroutine resolve_signal_in_mom
 
 end Module subroutines
