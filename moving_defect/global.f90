@@ -25,7 +25,7 @@ Module global
   real :: omega_pmax, omega_smax, omega_imax
   real :: norm
   real :: eps_r
-  real :: startx, endx, v, gv
+  real :: startx, endx, v, gv, def_x_pos, def_y_pos
   integer :: tot_h, t_stfft
   
   NAMELIST /indata/                &
@@ -49,6 +49,8 @@ Module global
        &     t_stfft,              &   ! time steps after which start recording
        &     dxsav_sp,             &   ! time interval for spectra evaluation
        &     eps_r,                &   ! max error for odeint subroutine
+       &     def_x_pos,            &   ! x coordinate of defect
+       &     def_y_pos,            &   ! y coordinate of defect
        &     gv                        ! strength of defect potential
   
 end Module global
