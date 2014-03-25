@@ -277,7 +277,7 @@ CONTAINS
     write(*,*) omega_1, omega_2, omega_3, omega_4, i_t_1, i_t_2, i_t_3, i_t_4,&
                i_tmax_p, i_tmax_s, i_tmax_i, omega_pmax, omega_smax, omega_imax
 
-    call resolve_signal
+    !call resolve_signal
     call resolve_signal_in_mom
 
   end Subroutine eval_spectr
