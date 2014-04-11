@@ -88,7 +88,7 @@ CONTAINS
     real(8), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
     real(8), PARAMETER :: TINY=1.0e-30    
-    INTEGER(I4B), PARAMETER :: MAXSTP=1000000000
+    INTEGER(I4B), PARAMETER :: MAXSTP=1000000
     !Runge-Kutta driver with adaptive step size control.Integrate the array
     !of starting values ystart from x1 to x2 with accuracy eps storing
     !intermediate results in the module variables in ode_path. h1 should be
