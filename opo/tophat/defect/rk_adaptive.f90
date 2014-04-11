@@ -8,7 +8,7 @@ CONTAINS
   Subroutine derivs(x,y,dydx)
 
     USE FFTW3
-    IMPLICIT NONE    
+    IMPLICIT NONE
 
     ! fft stuff
     ! forward means real space to momentum space, backward the opposite
@@ -21,24 +21,24 @@ CONTAINS
     ! array dimensions
     integer(C_INT), parameter :: nx=size(pdb,1), ny=size(pdb,2)
 
-    REAL(SP), INTENT(IN) :: x    
-    COMPLEX(SP), DIMENSION(:,:,:), INTENT(IN) :: y    
-    COMPLEX(SP), DIMENSION(:,:,:), INTENT(OUT) :: dydx    
-    INTEGER :: ix,iy    
-    REAL :: sx, sy    
+    REAL(SP), INTENT(IN) :: x
+    COMPLEX(SP), DIMENSION(:,:,:), INTENT(IN) :: y
+    COMPLEX(SP), DIMENSION(:,:,:), INTENT(OUT) :: dydx
+    INTEGER :: ix,iy
+    REAL :: sx, sy
 
     ! allocating memory contiguously using C function
     p = fftw_alloc_complex(int(nx*ny, C_SIZE_T))
     q = fftw_alloc_complex(int(nx*ny, C_SIZE_T))
     r = fftw_alloc_complex(int(nx*ny, C_SIZE_T))
     s = fftw_alloc_complex(int(nx*ny, C_SIZE_T))
-    
+ 
     ! here we use the usual fortran order
     call c_f_pointer(p, in_forward, [nx,ny])
     call c_f_pointer(q, out_forward, [nx,ny])
     call c_f_pointer(r, in_backward, [nx,ny])
     call c_f_pointer(s, out_backward, [nx,ny])
-    
+ 
     ! prepare plans needed by fftw3
     ! here we must make sure we reverse the array dimensions for FFTW
     plan_forward = fftw_plan_dft_2d(ny, nx, in_forward, out_forward, FFTW_FORWARD, FFTW_ESTIMATE)
@@ -46,34 +46,34 @@ CONTAINS
 
 
     !generate the energy dependence of the pump
-    pump=pump_spatial*(cos(omega_p*x)+(0.0,-1.0)*sin(omega_p*x))    
+    pump=pump_spatial*(cos(omega_p*x)+(0.0,-1.0)*sin(omega_p*x))
 
     !right hand side of the equation of motion for the photon population
 
     !photon part
-    dydx(:,:,1)= (0.0,-1.0)*y(:,:,2)-(0.0,1.0)*delta*y(:,:,1)-&    
+    dydx(:,:,1)= (0.0,-1.0)*y(:,:,2)-(0.0,1.0)*delta*y(:,:,1)-&
          kappa_C*y(:,:,1)+(0.0,-1.0)*pump(:,:)
     !add a potential to the photon part
     dydx(:,:,1) = dydx(:,:,1)+(0.0,1.0)*pot_c(:,:)*y(:,:,1)
     !exciton part
-    dydx(:,:,2)= -kappa_X*y(:,:,2)+&    
-         (0.0,-1.0)*ABS(y(:,:,2))*ABS(y(:,:,2))*y(:,:,2)/norm+ &    
-         &(0.0,-1.0)*y(:,:,1)    
+    dydx(:,:,2)= -kappa_X*y(:,:,2)+&
+         (0.0,-1.0)*ABS(y(:,:,2))*ABS(y(:,:,2))*y(:,:,2)/norm+ &
+         &(0.0,-1.0)*y(:,:,1)
 
-    !adding the kinetic energy by means of the FFT  
+    !adding the kinetic energy by means of the FFT
 
     !fft to momentum space
-    in_forward(:,:)=y(:,:,1)    
+    in_forward(:,:)=y(:,:,1)
     call fftw_execute_dft(plan_forward, in_forward, out_forward)
     in_backward=kinetic*out_forward
     !fft back to real space
     call fftw_execute_dft(plan_backward, in_backward, out_backward)
-    dydx(:,:,1)=dydx(:,:,1)+out_backward*CMPLX(0.0,-1.0)    
-  
+    dydx(:,:,1)=dydx(:,:,1)+out_backward*CMPLX(0.0,-1.0)
+ 
     ! avoiding any potential memory leaks
     call fftw_destroy_plan(plan_forward)
     call fftw_destroy_plan(plan_backward)
-    
+ 
     call fftw_free(p)
     call fftw_free(q)
     call fftw_free(r)
@@ -81,7 +81,7 @@ CONTAINS
 
   END SUBROUTINE derivs
 
-  SUBROUTINE odeint_rk(ystart,x1,x2,eps,h1,hmin)    
+  SUBROUTINE odeint_rk(ystart,x1,x2,eps,h1,hmin)
     IMPLICIT NONE    
 
     COMPLEX(SP), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
