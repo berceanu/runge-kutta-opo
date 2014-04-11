@@ -3,11 +3,11 @@
 f90comp = ifort
 switch = -r8
 
-# List of includes for the compiler 
+# List of includes for the compiler
 NAG_PATH=/opt/NAG/fnl6i04dcl
 NAG_MODULES=$(NAG_PATH)/nagfl90_modules/
 NAG_LIBS=$(NAG_PATH)/lib
-includes = -I$(NAG_MODULES)  
+includes = -I$(NAG_MODULES)
 libs = $(NAG_LIBS)/libnagfl90_nag.a
 
 # Makefile

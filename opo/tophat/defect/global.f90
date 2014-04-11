@@ -28,7 +28,7 @@ Module global
   real :: eps_r, gv, def_x_pos, def_y_pos
   real :: t_stfft
   real :: mom_cent, mom_cut
-  
+
   NAMELIST /indata/               &
        &     run,                  &   ! run from scratch?
        &     in_sswf_rk,           &   ! if not, starting wf
@@ -62,5 +62,5 @@ Module global
        &     def_x_pos,            &   ! x coordinate of defect
        &     def_y_pos,            &   ! y coordinate of defect
        &     gv                        ! strength of defect potential
-  
+
 end Module global
