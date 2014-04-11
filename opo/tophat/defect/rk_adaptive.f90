@@ -21,8 +21,8 @@ CONTAINS
     integer(C_INT) :: dimx, dimy  ! array dimensions
 
     real(8), INTENT(IN) :: x
-    COMPLEX(DP), DIMENSION(:,:,:), INTENT(IN) :: y
-    COMPLEX(DP), DIMENSION(:,:,:), INTENT(OUT) :: dydx
+    complex(8), DIMENSION(:,:,:), INTENT(IN) :: y
+    complex(8), DIMENSION(:,:,:), INTENT(OUT) :: dydx
     INTEGER :: ix,iy
     real(8) :: sx, sy
 
@@ -86,7 +86,7 @@ CONTAINS
   SUBROUTINE odeint_rk(ystart,x1,x2,eps,h1,hmin)
     IMPLICIT NONE    
 
-    COMPLEX(DP), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
+    complex(8), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
     real(8), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
     real(8), PARAMETER :: TINY=1.0e-30    
@@ -102,10 +102,10 @@ CONTAINS
     
     INTEGER(I4B) :: nstp    
     real(8) :: h,hdid,hnext,x,xsav    
-    COMPLEX(DP), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
+    complex(8), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
     real(8) :: dphase    
     real(8), External :: findfermpart,findcoopernum    
-    COMPLEX, External :: findfermcond    
+    complex(8), External :: findfermcond    
 
 
     x=x1    
@@ -176,7 +176,7 @@ CONTAINS
 
   SUBROUTINE odeint_sp(ystart,x1,x2,eps,h1,hmin)
     IMPLICIT NONE    
-    COMPLEX(DP), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
+    complex(8), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
     real(8), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
     real(8), PARAMETER :: TINY=1.0e-30    
@@ -192,10 +192,10 @@ CONTAINS
     
     INTEGER(I4B) :: nstp    
     real(8) :: h,hdid,hnext,x,xsav    
-    COMPLEX(DP), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
+    complex(8), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
     real(8) :: dphase    
     real(8), External :: findfermpart,findcoopernum    
-    COMPLEX, External :: findfermcond    
+    complex(8), External :: findfermcond    
     x=x1    
     h=sign(h1,x2-x1)    
     nok=0    
@@ -252,8 +252,8 @@ CONTAINS
 
   SUBROUTINE rkqs(y,dydx,x,htry,eps,yscal,hdid,hnext)    
     IMPLICIT NONE    
-    COMPLEX(DP), DIMENSION(:,:,:), INTENT(INOUT) :: y    
-    COMPLEX(DP), DIMENSION(:,:,:), INTENT(IN) :: dydx,yscal    
+    complex(8), DIMENSION(:,:,:), INTENT(INOUT) :: y    
+    complex(8), DIMENSION(:,:,:), INTENT(IN) :: dydx,yscal    
     real(8), INTENT(INOUT) :: x    
     real(8), INTENT(IN) :: htry,eps    
     real(8), INTENT(OUT) :: hdid,hnext    
@@ -269,7 +269,7 @@ CONTAINS
     !user-supplied subroutine that computes the right-hand-side derivatives.    
     INTEGER(I4B) :: ndum    
     real(8) :: errmax,h,htemp,xnew    
-    COMPLEX(DP), DIMENSION(size(y,1),size(y,2),size(y,3)) :: yerr,ytemp    
+    complex(8), DIMENSION(size(y,1),size(y,2),size(y,3)) :: yerr,ytemp    
     real(8), PARAMETER :: SAFETY=0.9,PGROW=-0.2,PSHRNK=-0.25,&    
     ERRCON=1.89e-4    
     !The value ERRCON equals (5/SAFETY)**(1/PGROW),see use below.    
@@ -305,9 +305,9 @@ CONTAINS
 
   SUBROUTINE rkck(y,dydx,x,h,yout,yerr)
     IMPLICIT NONE
-    COMPLEX(DP), DIMENSION(:,:,:), INTENT(IN) :: y,dydx
+    complex(8), DIMENSION(:,:,:), INTENT(IN) :: y,dydx
     real(8), INTENT(IN) :: x,h
-    COMPLEX(DP), DIMENSION(:,:,:), INTENT(OUT) :: yout,yerr
+    complex(8), DIMENSION(:,:,:), INTENT(OUT) :: yout,yerr
     INTEGER, EXTERNAL :: assert_eq
     !Given values for N variables y and their derivatives dydx known at x
     !use the fifth order Cash-Karp Runge-Kutta method to advance the
@@ -317,7 +317,7 @@ CONTAINS
     !subroutine derivs(x,y,dydx),which returns derivatives dydx at x
 
     INTEGER(I4B) :: ndum
-    COMPLEX(DP), DIMENSION(size(y,1),size(y,2),size(y,3)) :: ak2,ak3,ak4,ak5,ak6,ytemp
+    complex(8), DIMENSION(size(y,1),size(y,2),size(y,3)) :: ak2,ak3,ak4,ak5,ak6,ytemp
     real(8), PARAMETER :: A2=0.2,A3=0.3,A4=0.6,A5=1.0,&
              A6=0.875,B21=0.2,B31=3.0/40.0,B32=9.0/40.0,&
              B41=0.3,B42=-0.9,B43=1.2,B51=-11.0/54.0,&

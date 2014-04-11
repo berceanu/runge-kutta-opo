@@ -7,7 +7,7 @@
 
         real(8) :: x1_r,x2_r,h1_r,hmin_r
         real(8), EXTERNAL ::  findfermpart,findcoopernum
-        COMPLEX, EXTERNAL :: findfermcond1, findfermcond2
+        complex(8), EXTERNAL :: findfermcond1, findfermcond2
 
         ! fft stuff
         ! forward means real space to momentum space
