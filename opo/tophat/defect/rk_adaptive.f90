@@ -6,14 +6,44 @@ MODULE rk_adaptive
 CONTAINS
 
   Subroutine derivs(x,y,dydx)
-    USE nag_fft, ONLY: nag_fft_2d, nag_fft_trig  
+
+    USE FFTW3
     IMPLICIT NONE    
+
+    ! fft stuff
+    ! forward means real space to momentum space, backward the opposite
+    type(C_PTR) :: plan_forward, plan_backward
+    complex(C_DOUBLE_COMPLEX), pointer :: in_forward(:,:)
+    complex(C_DOUBLE_COMPLEX), pointer :: out_forward(:,:)
+    complex(C_DOUBLE_COMPLEX), pointer :: in_backward(:,:)
+    complex(C_DOUBLE_COMPLEX), pointer :: out_backward(:,:)
+    type(C_PTR) :: p, q, r, s
+    ! array dimensions
+    integer(C_INT), parameter :: nx=size(pdb,1), ny=size(pdb,2)
+
     REAL(SP), INTENT(IN) :: x    
     COMPLEX(SP), DIMENSION(:,:,:), INTENT(IN) :: y    
     COMPLEX(SP), DIMENSION(:,:,:), INTENT(OUT) :: dydx    
     INTEGER :: ix,iy    
     REAL :: sx, sy    
-    COMPLEX, DIMENSION(size(pdb,1),size(pdb,2)) :: pom    
+
+    ! allocating memory contiguously using C function
+    p = fftw_alloc_complex(int(nx*ny, C_SIZE_T))
+    q = fftw_alloc_complex(int(nx*ny, C_SIZE_T))
+    r = fftw_alloc_complex(int(nx*ny, C_SIZE_T))
+    s = fftw_alloc_complex(int(nx*ny, C_SIZE_T))
+    
+    ! here we use the usual fortran order
+    call c_f_pointer(p, in_forward, [nx,ny])
+    call c_f_pointer(q, out_forward, [nx,ny])
+    call c_f_pointer(r, in_backward, [nx,ny])
+    call c_f_pointer(s, out_backward, [nx,ny])
+    
+    ! prepare plans needed by fftw3
+    ! here we must make sure we reverse the array dimensions for FFTW
+    plan_forward = fftw_plan_dft_2d(ny, nx, in_forward, out_forward, FFTW_FORWARD, FFTW_ESTIMATE)
+    plan_backward = fftw_plan_dft_2d(ny, nx, in_backward, out_backward, FFTW_BACKWARD, FFTW_ESTIMATE)
+
 
     !generate the energy dependence of the pump
     pump=pump_spatial*(cos(omega_p*x)+(0.0,-1.0)*sin(omega_p*x))    
@@ -33,16 +63,18 @@ CONTAINS
     !adding the kinetic energy by means of the FFT  
 
     !fft to momentum space
-    pom(:,:)=nag_fft_2d(y(:,:,1),trig_m=trig_x,trig_n=trig_y)    
-    pom=kinetic*pom    
+    in_forward(:,:)=y(:,:,1)    
+    call fftw_execute_dft(plan_forward, in_forward, out_forward)
+    in_backward=kinetic*out_forward
     !fft back to real space
-    pom(:,:)=nag_fft_2d(pom(:,:),inverse=.true.,trig_m=trig_x,trig_n=trig_y)    
-    dydx(:,:,1)=dydx(:,:,1)+pom*CMPLX(0.0,-1.0)    
+    call fftw_execute_dft(plan_backward, in_backward, out_backward)
+    dydx(:,:,1)=dydx(:,:,1)+out_backward*CMPLX(0.0,-1.0)    
   
   END SUBROUTINE derivs
 
   SUBROUTINE odeint_rk(ystart,x1,x2,eps,h1,hmin)    
     IMPLICIT NONE    
+
     COMPLEX(SP), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
     REAL(SP), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
@@ -63,6 +95,8 @@ CONTAINS
     REAL :: dphase    
     REAL, External :: findfermpart,findcoopernum    
     COMPLEX, External :: findfermcond    
+
+
     x=x1    
     h=sign(h1,x2-x1)    
     nok=0    
@@ -73,7 +107,7 @@ CONTAINS
        xsav=x-2.0_sp*dxsav_rk    
     end if    
     do nstp=1,MAXSTP     
-    !Take at most MAXSTP steps.
+    !Take at most MAXSTP steps
        call derivs(x,y,dydx)    
        yscal(:,:,:)=abs(y(:,:,:))+abs(h*dydx(:,:,:))+TINY    
        !Scaling used to monitor accuracy. This general purpose choice can be
