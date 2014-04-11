@@ -2,16 +2,24 @@
         USE global
         USE subroutines
         USE rk_adaptive
+        USE FFTW3
         IMPLICIT NONE
 
         REAL(SP)  :: x1_r,x2_r,h1_r,hmin_r    
         REAL, EXTERNAL ::  findfermpart,findcoopernum    
         COMPLEX, EXTERNAL :: findfermcond1, findfermcond2
 
+        ! fft stuff
+        ! forward means real space to momentum space
+        type(C_PTR) :: plan_forward
+        complex(C_DOUBLE_COMPLEX), pointer :: in_forward(:,:,:)
+        complex(C_DOUBLE_COMPLEX), pointer :: out_forward(:,:,:)
+        type(C_PTR) :: p, q
+        ! array dimensions
+        integer(C_INT), parameter :: nx=size(y_tot_0,1), ny=size(y_tot_0,2), nt=size(y_tot_0,3)
+
         open(unit=file_time_0, file="times_0.dat", status='replace')
-
         call read 
-
         tot_h=t_stfft+(Nt+1)*(dxsav_sp)
 
         allocate(pdb(Nx,Ny,2), kinetic(Nx,Ny), pot_c(Nx,Ny), pump_spatial(Nx,Ny))
@@ -24,28 +32,43 @@
 
         pdb=(0.0,0.0)
         write(label,FMT="(i3)") in_sswf_sp
-		!initialize wavefunction
+        !initialize wavefunction
         call init_pdb
         !use top hat pump
         call init_pump_th
 
-		!calculate kinetic energy
+        !calculate kinetic energy
         call setg
 
-		!GP time evolution
+        !GP time evolution
         x1_r=0.0    
         x2_r=tot_h    
         h1_r=0.001    
         hmin_r=0.0    
         CALL odeint_sp(pdb,x1_r,x2_r,eps_r,h1_r,hmin_r)    
 
+        ! allocating memory contiguously using C function
+        p = fftw_alloc_complex(int(nx*ny*nt, C_SIZE_T))
+        q = fftw_alloc_complex(int(nx*ny*nt, C_SIZE_T))
+        
+        ! here we use the usual fortran order
+        call c_f_pointer(p, in_forward, [nx,ny,nt])
+        call c_f_pointer(q, out_forward, [nx,ny,nt])
+        
+        ! prepare plans needed by fftw3
+        ! here we must make sure we reverse the array dimensions for FFTW
+        plan_forward = fftw_plan_dft_3d(nt, ny, nx, in_forward, out_forward, FFTW_FORWARD, FFTW_MEASURE)
+
         !FFT to energy and momentum space    
-        y_tot_0(:,:,:) = nag_fft_3d(y_tot_0(:,:,:))                 
-  
-		!same time evolution to file for integrating later in energy window
-  	    call export_evolution
+
+        in_forward = y_tot_0
+        call fftw_execute_dft(plan_forward, in_forward, out_forward)
+        y_tot_0 = out_forward
+        
+        !save time evolution to file for integrating later in energy window
+  	call export_evolution
   	    
-		!calculate the energy spectrum
+        !calculate the energy spectrum
         call eval_spectr_0
 
         deallocate(pdb, kinetic, pot_c, pump_spatial)
@@ -53,5 +76,10 @@
         deallocate(y_tot_0, int_sp)
 
         close(file_time_0)
+
+        ! avoiding any potential memory leaks
+        call fftw_destroy_plan(plan_forward)
+        call fftw_free(p)
+        call fftw_free(q)
 
       end Program RK_OPO_sp
