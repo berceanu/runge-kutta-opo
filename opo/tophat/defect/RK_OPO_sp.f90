@@ -16,7 +16,11 @@
         complex(C_DOUBLE_COMPLEX), pointer :: out_forward(:,:,:)
         type(C_PTR) :: p, q
         ! array dimensions
-        integer(C_INT), parameter :: nx=size(y_tot_0,1), ny=size(y_tot_0,2), nt=size(y_tot_0,3)
+        integer(C_INT) :: dimx, dimy, dimt
+
+        dimx=size(y_tot_0,1)
+        dimy=size(y_tot_0,2)
+        dimt=size(y_tot_0,3)
 
         open(unit=file_time_0, file="times_0.dat", status='replace')
         call read
@@ -48,16 +52,16 @@
         CALL odeint_sp(pdb,x1_r,x2_r,eps_r,h1_r,hmin_r)
 
         ! allocating memory contiguously using C function
-        p = fftw_alloc_complex(int(nx*ny*nt, C_SIZE_T))
-        q = fftw_alloc_complex(int(nx*ny*nt, C_SIZE_T))
+        p = fftw_alloc_complex(int(dimx*dimy*dimt, C_SIZE_T))
+        q = fftw_alloc_complex(int(dimx*dimy*dimt, C_SIZE_T))
 
         ! here we use the usual fortran order
-        call c_f_pointer(p, in_forward, [nx,ny,nt])
-        call c_f_pointer(q, out_forward, [nx,ny,nt])
+        call c_f_pointer(p, in_forward, [dimx,dimy,dimt])
+        call c_f_pointer(q, out_forward, [dimx,dimy,dimt])
 
         ! prepare plans needed by fftw3
         ! here we must make sure we reverse the array dimensions for FFTW
-        plan_forward = fftw_plan_dft_3d(nt, ny, nx, in_forward, out_forward, FFTW_FORWARD, FFTW_MEASURE)
+        plan_forward = fftw_plan_dft_3d(dimt, dimy, dimx, in_forward, out_forward, FFTW_FORWARD, FFTW_MEASURE)
 
         !FFT to energy and momentum space
 

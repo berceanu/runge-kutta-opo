@@ -18,8 +18,7 @@ CONTAINS
     complex(C_DOUBLE_COMPLEX), pointer :: in_backward(:,:)
     complex(C_DOUBLE_COMPLEX), pointer :: out_backward(:,:)
     type(C_PTR) :: p, q, r, s
-    ! array dimensions
-    integer(C_INT), parameter :: nx=size(pdb,1), ny=size(pdb,2)
+    integer(C_INT) :: dimx, dimy  ! array dimensions
 
     REAL(SP), INTENT(IN) :: x
     COMPLEX(SP), DIMENSION(:,:,:), INTENT(IN) :: y
@@ -27,22 +26,25 @@ CONTAINS
     INTEGER :: ix,iy
     REAL :: sx, sy
 
+    dimx=size(pdb,1)
+    dimy=size(pdb,2)
+
     ! allocating memory contiguously using C function
-    p = fftw_alloc_complex(int(nx*ny, C_SIZE_T))
-    q = fftw_alloc_complex(int(nx*ny, C_SIZE_T))
-    r = fftw_alloc_complex(int(nx*ny, C_SIZE_T))
-    s = fftw_alloc_complex(int(nx*ny, C_SIZE_T))
+    p = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
+    q = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
+    r = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
+    s = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
  
     ! here we use the usual fortran order
-    call c_f_pointer(p, in_forward, [nx,ny])
-    call c_f_pointer(q, out_forward, [nx,ny])
-    call c_f_pointer(r, in_backward, [nx,ny])
-    call c_f_pointer(s, out_backward, [nx,ny])
+    call c_f_pointer(p, in_forward, [dimx,dimy])
+    call c_f_pointer(q, out_forward, [dimx,dimy])
+    call c_f_pointer(r, in_backward, [dimx,dimy])
+    call c_f_pointer(s, out_backward, [dimx,dimy])
  
     ! prepare plans needed by fftw3
     ! here we must make sure we reverse the array dimensions for FFTW
-    plan_forward = fftw_plan_dft_2d(ny, nx, in_forward, out_forward, FFTW_FORWARD, FFTW_ESTIMATE)
-    plan_backward = fftw_plan_dft_2d(ny, nx, in_backward, out_backward, FFTW_BACKWARD, FFTW_ESTIMATE)
+    plan_forward = fftw_plan_dft_2d(dimy, dimx, in_forward, out_forward, FFTW_FORWARD, FFTW_ESTIMATE)
+    plan_backward = fftw_plan_dft_2d(dimy, dimx, in_backward, out_backward, FFTW_BACKWARD, FFTW_ESTIMATE)
 
 
     !generate the energy dependence of the pump
@@ -155,13 +157,13 @@ CONTAINS
       write(23, fmt=' ("#", 1x, "x", 12x, "y", 12x, "real(psi(2))", 1x, "aimag(psi(2))") ')    
       do iy=1, Ny    
          sy=-Ly+(iy-1)*ay    
-         do ix=1, Nx    
-            sx=-Lx+(ix-1)*ax    
-            write(22, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx,&    
-                 sy, real(y(ix,iy,1))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70, aimag(y(ix,iy,1))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70    
-            write(23, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx,&    
-                 sy, real(y(ix,iy,2))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70, aimag(y(ix,iy,2))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70    
-         end do    
+         do ix=1, Nx
+            sx=-Lx+(ix-1)*ax
+            write(22, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx, sy,&
+                   &real(y(ix,iy,1))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70, aimag(y(ix,iy,1))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70
+            write(23, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx, sy,&
+                   &real(y(ix,iy,2))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70, aimag(y(ix,iy,2))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70
+         end do
          write(22,*)    
          write(23,*)    
       end do    
