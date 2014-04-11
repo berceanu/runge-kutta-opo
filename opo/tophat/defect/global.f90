@@ -2,13 +2,13 @@ Module global
   USE ode_path
   implicit none
   character (len=3) :: label
-  complex, allocatable :: wave_f_mom(:,:,:)
-  complex, allocatable :: y_enfilt(:,:)
-  complex, allocatable :: wave_f_flt(:,:,:), wave_f_fltspc(:,:,:)
-  complex, allocatable :: psi(:,:,:), pump_spatial(:,:)
-  complex, allocatable :: y_tot_0(:,:,:)
-  complex, allocatable :: pdb(:,:,:)
-  complex, allocatable :: pump(:,:)
+  complex(8), allocatable :: wave_f_mom(:,:,:)
+  complex(8), allocatable :: y_enfilt(:,:)
+  complex(8), allocatable :: wave_f_flt(:,:,:), wave_f_fltspc(:,:,:)
+  complex(8), allocatable :: psi(:,:,:), pump_spatial(:,:)
+  complex(8), allocatable :: y_tot_0(:,:,:)
+  complex(8), allocatable :: pdb(:,:,:)
+  complex(8), allocatable :: pump(:,:)
   real(8), allocatable :: kinetic(:,:), pot_c(:,:)
   real(8), allocatable :: int_sp(:)
   integer :: run, in_sswf_rk, in_sswf_sp
