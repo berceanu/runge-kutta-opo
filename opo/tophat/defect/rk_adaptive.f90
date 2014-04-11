@@ -20,9 +20,9 @@ CONTAINS
     type(C_PTR) :: p, q, r, s
     integer(C_INT) :: dimx, dimy  ! array dimensions
 
-    REAL(SP), INTENT(IN) :: x
-    COMPLEX(SP), DIMENSION(:,:,:), INTENT(IN) :: y
-    COMPLEX(SP), DIMENSION(:,:,:), INTENT(OUT) :: dydx
+    real, INTENT(IN) :: x
+    COMPLEX(DP), DIMENSION(:,:,:), INTENT(IN) :: y
+    COMPLEX(DP), DIMENSION(:,:,:), INTENT(OUT) :: dydx
     INTEGER :: ix,iy
     REAL :: sx, sy
 
@@ -86,10 +86,10 @@ CONTAINS
   SUBROUTINE odeint_rk(ystart,x1,x2,eps,h1,hmin)
     IMPLICIT NONE    
 
-    COMPLEX(SP), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
-    REAL(SP), INTENT(IN) :: x1,x2,eps,h1,hmin    
+    COMPLEX(DP), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
+    real, INTENT(IN) :: x1,x2,eps,h1,hmin    
   
-    REAL(SP), PARAMETER :: TINY=1.0e-30_sp    
+    real, PARAMETER :: TINY=1.0e-30    
     INTEGER(I4B), PARAMETER :: MAXSTP=1000000000
     !Runge-Kutta driver with adaptive step size control.Integrate the array
     !of starting values ystart from x1 to x2 with accuracy eps storing
@@ -101,8 +101,8 @@ CONTAINS
     !he stepper routine to be used.
     
     INTEGER(I4B) :: nstp    
-    REAL(SP) :: h,hdid,hnext,x,xsav    
-    COMPLEX(SP), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
+    real :: h,hdid,hnext,x,xsav    
+    COMPLEX(DP), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
     REAL :: dphase    
     REAL, External :: findfermpart,findcoopernum    
     COMPLEX, External :: findfermcond    
@@ -115,7 +115,7 @@ CONTAINS
     kount=0    
     y(:,:,:)=ystart(:,:,:)    
     if (save_steps) then    
-       xsav=x-2.0_sp*dxsav_rk    
+       xsav=x-2.0*dxsav_rk    
     end if    
     do nstp=1,MAXSTP     
     !Take at most MAXSTP steps
@@ -176,10 +176,10 @@ CONTAINS
 
   SUBROUTINE odeint_sp(ystart,x1,x2,eps,h1,hmin)
     IMPLICIT NONE    
-    COMPLEX(SP), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
-    REAL(SP), INTENT(IN) :: x1,x2,eps,h1,hmin    
+    COMPLEX(DP), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
+    real, INTENT(IN) :: x1,x2,eps,h1,hmin    
   
-    REAL(SP), PARAMETER :: TINY=1.0e-30_sp    
+    real, PARAMETER :: TINY=1.0e-30    
     INTEGER(I4B), PARAMETER :: MAXSTP=1000000000
     !Runge-Kutta driver with adaptive step size control.Integrate the array
     !of starting values ystart from x1 to x2 with accuracy eps storing
@@ -191,8 +191,8 @@ CONTAINS
     !he stepper routine to be used.
     
     INTEGER(I4B) :: nstp    
-    REAL(SP) :: h,hdid,hnext,x,xsav    
-    COMPLEX(SP), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
+    real :: h,hdid,hnext,x,xsav    
+    COMPLEX(DP), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
     REAL :: dphase    
     REAL, External :: findfermpart,findcoopernum    
     COMPLEX, External :: findfermcond    
@@ -203,7 +203,7 @@ CONTAINS
     kount=0    
     y(:,:,:)=ystart(:,:,:)    
     if (save_steps) then    
-       xsav=x-2.0_sp*dxsav_sp    
+       xsav=x-2.0*dxsav_sp    
     end if    
     do nstp=1,MAXSTP
     !Take at most MAXSTP steps.
@@ -252,11 +252,11 @@ CONTAINS
 
   SUBROUTINE rkqs(y,dydx,x,htry,eps,yscal,hdid,hnext)    
     IMPLICIT NONE    
-    COMPLEX(SP), DIMENSION(:,:,:), INTENT(INOUT) :: y    
-    COMPLEX(SP), DIMENSION(:,:,:), INTENT(IN) :: dydx,yscal    
-    REAL(SP), INTENT(INOUT) :: x    
-    REAL(SP), INTENT(IN) :: htry,eps    
-    REAL(SP), INTENT(OUT) :: hdid,hnext    
+    COMPLEX(DP), DIMENSION(:,:,:), INTENT(INOUT) :: y    
+    COMPLEX(DP), DIMENSION(:,:,:), INTENT(IN) :: dydx,yscal    
+    real, INTENT(INOUT) :: x    
+    real, INTENT(IN) :: htry,eps    
+    real, INTENT(OUT) :: hdid,hnext    
     INTEGER, EXTERNAL :: assert_eq    
     !Fifth order Runge-Kutta step with monitoring of local runca ion error    
     !o ensure accuracy and adjus stepsize.Input are he dependent variable    
@@ -268,10 +268,10 @@ CONTAINS
     !accomplished,and hnext is he estimated nex stepsize.derivs is the    
     !user-supplied subroutine ha computes the right-hand-side deriva ives.    
     INTEGER(I4B) :: ndum    
-    REAL(SP) :: errmax,h,htemp,xnew    
-    COMPLEX(SP), DIMENSION(size(y,1),size(y,2),size(y,3)) :: yerr,ytemp    
-    REAL(SP), PARAMETER :: SAFETY=0.9_sp,PGROW=-0.2_sp,PSHRNK=-0.25_sp,&    
-         ERRCON=1.89e-4    
+    real :: errmax,h,htemp,xnew    
+    COMPLEX(DP), DIMENSION(size(y,1),size(y,2),size(y,3)) :: yerr,ytemp    
+    real, PARAMETER :: SAFETY=0.9,PGROW=-0.2,PSHRNK=-0.25,&    
+    ERRCON=1.89e-4    
     !The value ERRCON equals (5/SAFETY)**(1/PGROW),see use below.    
     ndum=assert_eq(size(y),size(dydx),size(yscal), "rkqs")     
     h=htry     
@@ -285,7 +285,7 @@ CONTAINS
        !Step succeeded.    
        htemp=SAFETY*h*(errmax**PSHRNK)     
        !Truncation error too large, reduce stepsize.    
-       h=sign(max(abs(htemp),0.1_sp*abs(h)),h)     
+       h=sign(max(abs(htemp),0.1*abs(h)),h)     
        !No more than a factor of 10.    
        xnew=x+h    
        if (xnew == x) write(*,*)  "stepsize underflow in rkqs"    
@@ -296,7 +296,7 @@ CONTAINS
        hnext=SAFETY*h*(errmax**PGROW)     
     else     
        !No more han a fac or of 5 increase.    
-       hnext=5.0_sp*h    
+       hnext=5.0*h    
     end if    
     hdid=h      
     x=x+h       
@@ -305,9 +305,9 @@ CONTAINS
 
   SUBROUTINE rkck(y,dydx,x,h,yout,yerr)
     IMPLICIT NONE
-    COMPLEX(SP), DIMENSION(:,:,:), INTENT(IN) :: y,dydx
-    REAL(SP), INTENT(IN) :: x,h
-    COMPLEX(SP), DIMENSION(:,:,:), INTENT(OUT) :: yout,yerr
+    COMPLEX(DP), DIMENSION(:,:,:), INTENT(IN) :: y,dydx
+    real, INTENT(IN) :: x,h
+    COMPLEX(DP), DIMENSION(:,:,:), INTENT(OUT) :: yout,yerr
     INTEGER, EXTERNAL :: assert_eq
     !Given values for N variables y and their derivatives dydx known at x
     !use the fifth order Cash-Karp Runge-Kutta method to advance the
@@ -317,18 +317,18 @@ CONTAINS
     !subroutine derivs(x,y,dydx),which returns derivatives dydx at x
 
     INTEGER(I4B) :: ndum
-    COMPLEX(SP), DIMENSION(size(y,1),size(y,2),size(y,3)) :: ak2,ak3,ak4,ak5,ak6,ytemp
-    REAL(SP), PARAMETER :: A2=0.2_sp,A3=0.3_sp,A4=0.6_sp,A5=1.0_sp,&
-             A6=0.875_sp,B21=0.2_sp,B31=3.0_sp/40.0_sp,B32=9.0_sp/40.0_sp,&
-             B41=0.3_sp,B42=-0.9_sp,B43=1.2_sp,B51=-11.0_sp/54.0_sp,&
-             B52=2.5_sp,B53=-70.0_sp/27.0_sp,B54=35.0_sp/27.0_sp,&
-             B61=1631.0_sp/55296.0_sp,B62=175.0_sp/512.0_sp,&
-             B63=575.0_sp/13824.0_sp,B64=44275.0_sp/110592.0_sp,&
-             B65=253.0_sp/4096.0_sp,C1=37.0_sp/378.0_sp,&
-             C3=250.0_sp/621.0_sp,C4=125.0_sp/594.0_sp,&
-             C6=512.0_sp/1771.0_sp,DC1=C1-2825.0_sp/27648.0_sp,&
-             DC3=C3-18575.0_sp/48384.0_sp,DC4=C4-13525.0_sp/55296.0_sp,&
-             DC5=-277.0_sp/14336.0_sp,DC6=C6-0.25_sp
+    COMPLEX(DP), DIMENSION(size(y,1),size(y,2),size(y,3)) :: ak2,ak3,ak4,ak5,ak6,ytemp
+    real, PARAMETER :: A2=0.2,A3=0.3,A4=0.6,A5=1.0,&
+             A6=0.875,B21=0.2,B31=3.0/40.0,B32=9.0/40.0,&
+             B41=0.3,B42=-0.9,B43=1.2,B51=-11.0/54.0,&
+             B52=2.5,B53=-70.0/27.0,B54=35.0/27.0,&
+             B61=1631.0/55296.0,B62=175.0/512.0,&
+             B63=575.0/13824.0,B64=44275.0/110592.0,&
+             B65=253.0/4096.0,C1=37.0/378.0,&
+             C3=250.0/621.0,C4=125.0/594.0,&
+             C6=512.0/1771.0,DC1=C1-2825.0/27648.0,&
+             DC3=C3-18575.0/48384.0,DC4=C4-13525.0/55296.0,&
+             DC5=-277.0/14336.0,DC6=C6-0.25
     ndum=assert_eq(size(y),size(dydx),size(yout),size(yerr),"rkck")
     ytemp=y+B21*h*dydx 
     !First step.

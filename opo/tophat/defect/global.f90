@@ -11,8 +11,6 @@ Module global
   complex, allocatable :: pump(:,:)
   real, allocatable :: kinetic(:,:), pot_c(:,:)
   real, allocatable :: int_sp(:)
-  integer, parameter :: SP2 = KIND(1.0)
-  integer, parameter :: dp2=kind(1.0d0)
   integer :: run, in_sswf_rk, in_sswf_sp
   integer :: kx_max(1)
   integer :: Nx, Ny, Nt

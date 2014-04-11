@@ -5,7 +5,7 @@
         USE FFTW3
         IMPLICIT NONE
 
-        REAL(SP)  :: x1_r,x2_r,h1_r,hmin_r
+        REAL :: x1_r,x2_r,h1_r,hmin_r
         REAL, EXTERNAL ::  findfermpart,findcoopernum
         COMPLEX, EXTERNAL :: findfermcond1, findfermcond2
 
