@@ -23,8 +23,6 @@ CONTAINS
     real(8), INTENT(IN) :: x
     complex(8), DIMENSION(:,:,:), INTENT(IN) :: y
     complex(8), DIMENSION(:,:,:), INTENT(OUT) :: dydx
-    INTEGER :: ix,iy
-    real(8) :: sx, sy
 
     dimx=size(pdb,1)
     dimy=size(pdb,2)
@@ -103,7 +101,6 @@ CONTAINS
     INTEGER(I4B) :: nstp    
     real(8) :: h,hdid,hnext,x,xsav    
     complex(8), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
-    real(8) :: dphase    
     real(8), External :: findfermpart,findcoopernum    
     complex(8), External :: findfermcond    
 
@@ -193,7 +190,6 @@ CONTAINS
     INTEGER(I4B) :: nstp    
     real(8) :: h,hdid,hnext,x,xsav    
     complex(8), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
-    real(8) :: dphase    
     real(8), External :: findfermpart,findcoopernum    
     complex(8), External :: findfermcond    
     x=x1    
@@ -361,8 +357,7 @@ FUNCTION assert_eq(n1,n2,n3,string)
   if (n1 == n2 .and. n2 == n3) then  
      assert_eq=n1  
   else  
-     write (*,*) "nrerror: an assert_eq failed with this tag: &  
-          &program terminated by assert_eq3"  
+     write (*,*) 'nrerror: an assert_eq failed with this tag: ', string
      STOP   
   end if  
 END FUNCTION assert_eq
