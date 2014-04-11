@@ -70,7 +70,7 @@ CONTAINS
     in_backward=kinetic*out_forward
     !fft back to real space
     call fftw_execute_dft(plan_backward, in_backward, out_backward)
-    dydx(:,:,1)=dydx(:,:,1)+out_backward*CMPLX(0.0,-1.0)
+    dydx(:,:,1) = dydx(:,:,1) + out_backward * cmplx(0.0,-1.0)
  
     ! avoiding any potential memory leaks
     call fftw_destroy_plan(plan_forward)

@@ -54,8 +54,8 @@ CONTAINS
 
     integer ix, iy
 
-    ix = (def_x_pos+Lx)/ax + 1
-    iy = (def_y_pos+Ly)/ay + 1
+    ix = int((def_x_pos+Lx)/ax + 1)
+    iy = int((def_y_pos+Ly)/ay + 1)
     !for old coordinates of (Nx/2,Ny/2) set def_x_pos = -ax, def_y_pos=-ay
 
     pot_c = 0.0
@@ -154,8 +154,8 @@ CONTAINS
 
   end subroutine setg
 
-  Subroutine export_evolution	  
-	implicit none  
+  Subroutine export_evolution
+    implicit none
     integer :: i_t    
     integer :: kx, ky    
   
@@ -168,7 +168,7 @@ CONTAINS
   
     do i_t=Nt/2+2, Nt    
        omega=2.0*pi*(i_t-1-Nt)/( (Nt-1)*dxsav_sp )    
-	     do ky=Ny/2+2, Ny  
+       do ky=Ny/2+2, Ny  
           mom_y=pi*(ky-1-Ny)/Ly    
           do kx=Nx/2+2, Nx    
              mom_x=pi*(kx-1-Nx)/Lx    
@@ -193,7 +193,7 @@ CONTAINS
     end do    
     do i_t=1, Nt/2+1    
        omega=2.0*pi*(i_t-1)/( (Nt-1)*dxsav_sp )    
-	     do ky=Ny/2+2, Ny  
+       do ky=Ny/2+2, Ny  
           mom_y=pi*(ky-1-Ny)/Ly    
           do kx=Nx/2+2, Nx    
              mom_x=pi*(kx-1-Nx)/Lx    
@@ -217,8 +217,8 @@ CONTAINS
     end do    
     end do    
     close(28)                
-  
-    100 format (5(1x, d12.5))	  
+
+    100 format (5(1x, d12.5))
   end Subroutine export_evolution    
 
   Subroutine import_evolution
@@ -259,17 +259,17 @@ CONTAINS
        end do    
     end do    
        
-    close(28)                        
-	  
-	101 format (5(1x, d12.5))  
-  end Subroutine import_evolution    
+    close(28)
+
+    101 format (5(1x, d12.5))
+  end Subroutine import_evolution
 
   Subroutine eval_spectr_0
     implicit none    
     integer :: i_t    
-    integer :: kx, ky    
+    integer :: kx
     real :: omega    
-    real :: mom_x, mom_y    
+    real :: mom_x
     
 	!full spectum	
     open(unit=23, file="spectr_om-vs-kx_no-trigg.dat", status='replace')    
@@ -300,7 +300,7 @@ CONTAINS
     end do    
     close(23)    
   
-	!integrated spectrum	
+    !integrated spectrum	
     open(unit=24, file="int-spectr_no-trigg.dat", status='replace')    
     write(24, fmt=' ("#", 1x, "omega", 20x, "int_omega") ')    
     int_sp=sum(sum(abs(y_tot_0), dim=1), dim=1)    
@@ -320,33 +320,36 @@ CONTAINS
     implicit none    
       
     real, intent (in) :: omega, omega_cut
-	character(len=*), intent (in) :: lbl	
-		
+    character(len=*), intent (in) :: lbl
+
     integer :: i_t, num
     integer :: i_tmax, i_tmax_i, i_tmax_f
 
-    real :: omega_i, omega_f    
-      
-	write(*,*) trim(adjustl(lbl))	
-	write(*,*) 'omega= ', omega	
-		
-    !find index of peak 
-    i_tmax = 1 + Nt/2 + omega/(2.0*pi) * (Nt-1)*dxsav_sp     
-    if ( (i_tmax.lt.1) .OR. (i_tmax.gt.Nt) ) &    
-		write(*,*) "index of "//trim(adjustl(lbl))//" peak out of range!"	
-		
+    real :: omega_i, omega_f
+
+    write(*,*) trim(adjustl(lbl))
+    write(*,*) 'omega= ', omega
+
+    !find index of peak
+    i_tmax = int(1 + Nt/2 + omega/(2.0*pi) * (Nt-1)*dxsav_sp)
+    if ((i_tmax.lt.1).or.(i_tmax.gt.Nt)) then
+        write(*,*) "index of "//trim(adjustl(lbl))//" peak out of range!"
+    end if
+
     !calculating indices of energy window
-	omega_i = omega - omega_cut	
-    write(*,*) 'omega_i= ', omega_i    
-	i_tmax_i = 1 + Nt/2 + omega_i/(2.0*pi) * (Nt-1)*dxsav_sp 	
-    if ( (i_tmax_i.lt.1) .OR. (i_tmax_i.gt.Nt) ) &    
-		write(*,*) "L index of "//trim(adjustl(lbl))//" out of range!"	
-		
-	omega_f = omega + omega_cut	
-    write(*,*) 'omega_f= ', omega_f    
-	i_tmax_f = 1 + Nt/2 + omega_f/(2.0*pi) * (Nt-1)*dxsav_sp 	
-    if ( (i_tmax_f.lt.1) .OR. (i_tmax_f.gt.Nt) ) &    
-		write(*,*) "R index of "//trim(adjustl(lbl))//" out of range!"	
+    omega_i = omega - omega_cut
+    write(*,*) 'omega_i= ', omega_i
+    i_tmax_i = int(1 + Nt/2 + omega_i/(2.0*pi) * (Nt-1)*dxsav_sp)
+    if ((i_tmax_i.lt.1).or.(i_tmax_i.gt.Nt)) then
+        write(*,*) "L index of "//trim(adjustl(lbl))//" out of range!"
+    end if
+
+    omega_f = omega + omega_cut
+    write(*,*) 'omega_f= ', omega_f
+    i_tmax_f = int(1 + Nt/2 + omega_f/(2.0*pi) * (Nt-1)*dxsav_sp)
+    if ((i_tmax_f.lt.1).or.(i_tmax_f.gt.Nt)) then
+        write(*,*) "R index of "//trim(adjustl(lbl))//" out of range!"
+    end if
 		
     !integrate in energy
     write(*,*) 'i_tmax_i= ', i_tmax_i    
@@ -355,21 +358,21 @@ CONTAINS
         
     y_enfilt=(0.0,0.0)
     
-    if ((i_tmax_f-i_tmax_i).eq.1) i_tmax_i=i_tmax_f     
+    if ((i_tmax_f-i_tmax_i).eq.1) i_tmax_i=i_tmax_f
 
-    do i_t=i_tmax_i, i_tmax_f    
-       y_enfilt(:,:)=y_enfilt(:,:) + y_tot_0(:,:,i_t)    
-    end do    
-      
+    do i_t=i_tmax_i, i_tmax_f
+       y_enfilt(:,:)=y_enfilt(:,:) + y_tot_0(:,:,i_t)
+    end do
+
     !normalize
-    num = i_tmax_f - i_tmax_i + 1    
-	y_enfilt(:,:)=y_enfilt(:,:)/num	
+    num = i_tmax_f - i_tmax_i + 1
+    y_enfilt(:,:)=y_enfilt(:,:)/num
 
   end Subroutine filter_peak
 
   Subroutine write_kx_max(lbl) 
     implicit none    
-	character(len=*), intent (in) :: lbl	
+    character(len=*), intent (in) :: lbl
     
     real :: mom_x_max
     
@@ -383,9 +386,9 @@ CONTAINS
 
   Subroutine write_peak_mom(lbl)
     implicit none    
-	character(len=*), intent (in) :: lbl	
+    character(len=*), intent (in) :: lbl
     
-	integer :: kx, ky	
+    integer :: kx, ky
     real :: mom_x, mom_y
   
     !write peak emission in momentum
@@ -425,9 +428,9 @@ CONTAINS
   
   Subroutine write_peak_spc(lbl)
     implicit none      
-	character(len=*), intent (in) :: lbl	
+    character(len=*), intent (in) :: lbl
     
-	integer :: ix, iy
+    integer :: ix, iy
     real :: sx, sy
 	
     !write peak emission in space    
