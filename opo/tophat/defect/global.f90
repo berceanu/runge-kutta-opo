@@ -9,7 +9,6 @@ Module global
   complex, allocatable :: y_tot_0(:,:,:)
   complex, allocatable :: pdb(:,:,:)
   complex, allocatable :: pump(:,:)
-  real, allocatable :: trig_x(:), trig_y(:), trig_t(:)
   real, allocatable :: kinetic(:,:), pot_c(:,:)
   real, allocatable :: int_sp(:)
   integer, parameter :: SP2 = KIND(1.0)
