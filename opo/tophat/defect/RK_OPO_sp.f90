@@ -5,8 +5,8 @@
         USE FFTW3
         IMPLICIT NONE
 
-        REAL(SP)  :: x1_r,x2_r,h1_r,hmin_r    
-        REAL, EXTERNAL ::  findfermpart,findcoopernum    
+        REAL(SP)  :: x1_r,x2_r,h1_r,hmin_r
+        REAL, EXTERNAL ::  findfermpart,findcoopernum
         COMPLEX, EXTERNAL :: findfermcond1, findfermcond2
 
         ! fft stuff
@@ -19,7 +19,7 @@
         integer(C_INT), parameter :: nx=size(y_tot_0,1), ny=size(y_tot_0,2), nt=size(y_tot_0,3)
 
         open(unit=file_time_0, file="times_0.dat", status='replace')
-        call read 
+        call read
         tot_h=t_stfft+(Nt+1)*(dxsav_sp)
 
         allocate(pdb(Nx,Ny,2), kinetic(Nx,Ny), pot_c(Nx,Ny), pump_spatial(Nx,Ny))
@@ -41,33 +41,33 @@
         call setg
 
         !GP time evolution
-        x1_r=0.0    
-        x2_r=tot_h    
-        h1_r=0.001    
-        hmin_r=0.0    
-        CALL odeint_sp(pdb,x1_r,x2_r,eps_r,h1_r,hmin_r)    
+        x1_r=0.0
+        x2_r=tot_h
+        h1_r=0.001
+        hmin_r=0.0
+        CALL odeint_sp(pdb,x1_r,x2_r,eps_r,h1_r,hmin_r)
 
         ! allocating memory contiguously using C function
         p = fftw_alloc_complex(int(nx*ny*nt, C_SIZE_T))
         q = fftw_alloc_complex(int(nx*ny*nt, C_SIZE_T))
-        
+
         ! here we use the usual fortran order
         call c_f_pointer(p, in_forward, [nx,ny,nt])
         call c_f_pointer(q, out_forward, [nx,ny,nt])
-        
+
         ! prepare plans needed by fftw3
         ! here we must make sure we reverse the array dimensions for FFTW
         plan_forward = fftw_plan_dft_3d(nt, ny, nx, in_forward, out_forward, FFTW_FORWARD, FFTW_MEASURE)
 
-        !FFT to energy and momentum space    
+        !FFT to energy and momentum space
 
         in_forward = y_tot_0
         call fftw_execute_dft(plan_forward, in_forward, out_forward)
         y_tot_0 = out_forward
-        
+
         !save time evolution to file for integrating later in energy window
-  	call export_evolution
-  	    
+        call export_evolution
+
         !calculate the energy spectrum
         call eval_spectr_0
 
