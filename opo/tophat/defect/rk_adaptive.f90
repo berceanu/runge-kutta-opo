@@ -20,11 +20,11 @@ CONTAINS
     type(C_PTR) :: p, q, r, s
     integer(C_INT) :: dimx, dimy  ! array dimensions
 
-    real, INTENT(IN) :: x
+    real(8), INTENT(IN) :: x
     COMPLEX(DP), DIMENSION(:,:,:), INTENT(IN) :: y
     COMPLEX(DP), DIMENSION(:,:,:), INTENT(OUT) :: dydx
     INTEGER :: ix,iy
-    REAL :: sx, sy
+    real(8) :: sx, sy
 
     dimx=size(pdb,1)
     dimy=size(pdb,2)
@@ -87,9 +87,9 @@ CONTAINS
     IMPLICIT NONE    
 
     COMPLEX(DP), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
-    real, INTENT(IN) :: x1,x2,eps,h1,hmin    
+    real(8), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
-    real, PARAMETER :: TINY=1.0e-30    
+    real(8), PARAMETER :: TINY=1.0e-30    
     INTEGER(I4B), PARAMETER :: MAXSTP=1000000000
     !Runge-Kutta driver with adaptive step size control.Integrate the array
     !of starting values ystart from x1 to x2 with accuracy eps storing
@@ -101,10 +101,10 @@ CONTAINS
     !he stepper routine to be used.
     
     INTEGER(I4B) :: nstp    
-    real :: h,hdid,hnext,x,xsav    
+    real(8) :: h,hdid,hnext,x,xsav    
     COMPLEX(DP), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
-    REAL :: dphase    
-    REAL, External :: findfermpart,findcoopernum    
+    real(8) :: dphase    
+    real(8), External :: findfermpart,findcoopernum    
     COMPLEX, External :: findfermcond    
 
 
@@ -148,7 +148,7 @@ CONTAINS
     write(*,*) "too many steps in odeint"    
   CONTAINS    
     SUBROUTINE save_a_step_rk    
-      real :: sx,sy    
+      real(8) :: sx,sy    
       integer :: ix, iy    
       write(label,FMT="(i3)") kount    
       open(unit=22, file="phcplx-opo_spc"//trim(adjustl(label))//".dat", status='replace')    
@@ -177,9 +177,9 @@ CONTAINS
   SUBROUTINE odeint_sp(ystart,x1,x2,eps,h1,hmin)
     IMPLICIT NONE    
     COMPLEX(DP), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
-    real, INTENT(IN) :: x1,x2,eps,h1,hmin    
+    real(8), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
-    real, PARAMETER :: TINY=1.0e-30    
+    real(8), PARAMETER :: TINY=1.0e-30    
     INTEGER(I4B), PARAMETER :: MAXSTP=1000000000
     !Runge-Kutta driver with adaptive step size control.Integrate the array
     !of starting values ystart from x1 to x2 with accuracy eps storing
@@ -191,10 +191,10 @@ CONTAINS
     !he stepper routine to be used.
     
     INTEGER(I4B) :: nstp    
-    real :: h,hdid,hnext,x,xsav    
+    real(8) :: h,hdid,hnext,x,xsav    
     COMPLEX(DP), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
-    REAL :: dphase    
-    REAL, External :: findfermpart,findcoopernum    
+    real(8) :: dphase    
+    real(8), External :: findfermpart,findcoopernum    
     COMPLEX, External :: findfermcond    
     x=x1    
     h=sign(h1,x2-x1)    
@@ -254,23 +254,23 @@ CONTAINS
     IMPLICIT NONE    
     COMPLEX(DP), DIMENSION(:,:,:), INTENT(INOUT) :: y    
     COMPLEX(DP), DIMENSION(:,:,:), INTENT(IN) :: dydx,yscal    
-    real, INTENT(INOUT) :: x    
-    real, INTENT(IN) :: htry,eps    
-    real, INTENT(OUT) :: hdid,hnext    
+    real(8), INTENT(INOUT) :: x    
+    real(8), INTENT(IN) :: htry,eps    
+    real(8), INTENT(OUT) :: hdid,hnext    
     INTEGER, EXTERNAL :: assert_eq    
-    !Fifth order Runge-Kutta step with monitoring of local runca ion error    
-    !o ensure accuracy and adjus stepsize.Input are he dependent variable    
-    !vector y and its derivative dydx at the star ing value of the    
-    !independent variable x Also input are he s epsize to be attempted htry    
-    !he required accuracy eps and the vector yscal agains which the error    
-    !is scaled.y dydx and yscal areallof hesamelengh.Onoupu,y and x are    
-    !replaced by their new values,hdid is he s epsize ha was ac ually    
-    !accomplished,and hnext is he estimated nex stepsize.derivs is the    
-    !user-supplied subroutine ha computes the right-hand-side deriva ives.    
+    !Fifth order Runge-Kutta step with monitoring of local truncation error    
+    !to ensure accuracy and adjust stepsize. Input are the dependent variable    
+    !vector y and its derivative dydx at the starting value of the    
+    !independent variable x. Also input are the stepsize to be attempted htry    
+    !the required accuracy eps and the vector yscal against which the error    
+    !is scaled. y dydx and yscal are all of the same lengh. On output, y and x are    
+    !replaced by their new values, hdid is the stepsize that was actually    
+    !accomplished, and hnext is the estimated next stepsize. derivs is the    
+    !user-supplied subroutine that computes the right-hand-side derivatives.    
     INTEGER(I4B) :: ndum    
-    real :: errmax,h,htemp,xnew    
+    real(8) :: errmax,h,htemp,xnew    
     COMPLEX(DP), DIMENSION(size(y,1),size(y,2),size(y,3)) :: yerr,ytemp    
-    real, PARAMETER :: SAFETY=0.9,PGROW=-0.2,PSHRNK=-0.25,&    
+    real(8), PARAMETER :: SAFETY=0.9,PGROW=-0.2,PSHRNK=-0.25,&    
     ERRCON=1.89e-4    
     !The value ERRCON equals (5/SAFETY)**(1/PGROW),see use below.    
     ndum=assert_eq(size(y),size(dydx),size(yscal), "rkqs")     
@@ -306,7 +306,7 @@ CONTAINS
   SUBROUTINE rkck(y,dydx,x,h,yout,yerr)
     IMPLICIT NONE
     COMPLEX(DP), DIMENSION(:,:,:), INTENT(IN) :: y,dydx
-    real, INTENT(IN) :: x,h
+    real(8), INTENT(IN) :: x,h
     COMPLEX(DP), DIMENSION(:,:,:), INTENT(OUT) :: yout,yerr
     INTEGER, EXTERNAL :: assert_eq
     !Given values for N variables y and their derivatives dydx known at x
@@ -318,7 +318,7 @@ CONTAINS
 
     INTEGER(I4B) :: ndum
     COMPLEX(DP), DIMENSION(size(y,1),size(y,2),size(y,3)) :: ak2,ak3,ak4,ak5,ak6,ytemp
-    real, PARAMETER :: A2=0.2,A3=0.3,A4=0.6,A5=1.0,&
+    real(8), PARAMETER :: A2=0.2,A3=0.3,A4=0.6,A5=1.0,&
              A6=0.875,B21=0.2,B31=3.0/40.0,B32=9.0/40.0,&
              B41=0.3,B42=-0.9,B43=1.2,B51=-11.0/54.0,&
              B52=2.5,B53=-70.0/27.0,B54=35.0/27.0,&

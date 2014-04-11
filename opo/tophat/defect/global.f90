@@ -9,22 +9,22 @@ Module global
   complex, allocatable :: y_tot_0(:,:,:)
   complex, allocatable :: pdb(:,:,:)
   complex, allocatable :: pump(:,:)
-  real, allocatable :: kinetic(:,:), pot_c(:,:)
-  real, allocatable :: int_sp(:)
+  real(8), allocatable :: kinetic(:,:), pot_c(:,:)
+  real(8), allocatable :: int_sp(:)
   integer :: run, in_sswf_rk, in_sswf_sp
   integer :: kx_max(1)
   integer :: Nx, Ny, Nt
   integer :: file_time_0=29
   integer :: kount_st, kount_end
-  real :: Lx, Ly, ax, ay
-  real :: delta
-  real :: kappa_C, kappa_X, sigma_p, k_p
-  real :: f_p, omega_p
-  real :: omega_cut_p, omega_s, omega_cut_s, omega_id, omega_cut_id
-  real :: norm, tot_h
-  real :: eps_r, gv, def_x_pos, def_y_pos
-  real :: t_stfft
-  real :: mom_cent, mom_cut
+  real(8) :: Lx, Ly, ax, ay
+  real(8) :: delta
+  real(8) :: kappa_C, kappa_X, sigma_p, k_p
+  real(8) :: f_p, omega_p
+  real(8) :: omega_cut_p, omega_s, omega_cut_s, omega_id, omega_cut_id
+  real(8) :: norm, tot_h
+  real(8) :: eps_r, gv, def_x_pos, def_y_pos
+  real(8) :: t_stfft
+  real(8) :: mom_cent, mom_cut
 
   NAMELIST /indata/               &
        &     run,                  &   ! run from scratch?
