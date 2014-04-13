@@ -22,9 +22,9 @@ contains
   subroutine create_fftw
     implicit none
 
-    integer iret ! fftw multi-thread initialization return code
+    integer(C_INT) iret ! fftw multi-thread initialization return code
 
-    call fftw_init_threads(iret)
+    iret = fftw_init_threads()
     write(*,*) iret
     call fftw_plan_with_nthreads(8)
 
