@@ -6,7 +6,6 @@ MODULE rk_adaptive
 CONTAINS
 
   Subroutine derivs(x,y,dydx)
-  ! TODO: implement multi-threading fftw
 
     USE FFTW3
     IMPLICIT NONE
@@ -85,6 +84,7 @@ CONTAINS
   END SUBROUTINE derivs
 
   SUBROUTINE odeint_rk(ystart,x1,x2,eps,h1,hmin)
+  ! TODO: implement multi-threading fftw
     IMPLICIT NONE    
 
     complex(8), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
@@ -272,7 +272,7 @@ CONTAINS
     real(8), PARAMETER :: SAFETY=0.9,PGROW=-0.2,PSHRNK=-0.25,&    
     ERRCON=1.89e-4    
     !The value ERRCON equals (5/SAFETY)**(1/PGROW),see use below.    
-    ndum=assert_eq(size(y),size(dydx),size(yscal), "rkqs")     
+    ndum=assert_eq(size(y),size(dydx),size(yscal),'rkqs')     
     h=htry     
     !Set step size to the initial trial value.     
     do    
@@ -328,7 +328,7 @@ CONTAINS
              C6=512.0/1771.0,DC1=C1-2825.0/27648.0,&
              DC3=C3-18575.0/48384.0,DC4=C4-13525.0/55296.0,&
              DC5=-277.0/14336.0,DC6=C6-0.25
-    ndum=assert_eq(size(y),size(dydx),size(yout),size(yerr),"rkck")
+    ndum=assert_eq(size(y),size(dydx),size(yout),size(yerr),'rkck')
     ytemp=y+B21*h*dydx 
     !First step.
     call derivs(x+A2*h,ytemp,ak2) 
@@ -353,14 +353,15 @@ CONTAINS
   
 end MODULE rk_adaptive
 
-FUNCTION assert_eq(n1,n2,n3,string)  
-  CHARACTER(LEN=*), INTENT(IN) :: string  
-  INTEGER, INTENT(IN) :: n1,n2,n3  
-  INTEGER :: assert_eq  
-  if (n1 == n2 .and. n2 == n3) then  
-     assert_eq=n1  
+function assert_eq(n1, n2, n3, string) result(res)
+  integer, intent(in) :: n1,n2,n3  
+  character(len=4), intent(in) :: string  
+  integer :: res 
+
+  if ((n1 == n2).and.(n2 == n3)) then  
+     res = n1  
   else  
      write (*,*) 'nrerror: an assert_eq failed with this tag: ', string
-     STOP   
+     stop   
   end if  
-END FUNCTION assert_eq
+end function assert_eq
