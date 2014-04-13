@@ -65,9 +65,11 @@ CONTAINS
     !fft to momentum space
     in_forward(:,:)=y(:,:,1)
     call fftw_execute_dft(plan_forward, in_forward, out_forward)
+    out_forward = out_forward/sqrt(real(dimx*dimy)) !normalization
     in_backward=kinetic*out_forward
     !fft back to real space
     call fftw_execute_dft(plan_backward, in_backward, out_backward)
+    out_backward = out_backward/sqrt(real(dimx*dimy)) !normalization
     dydx(:,:,1) = dydx(:,:,1) + out_backward * cmplx(0.0,-1.0)
  
     ! avoiding any potential memory leaks
