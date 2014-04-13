@@ -13,7 +13,12 @@ switch = -g3 -Wall -Wextra -Wconversion -pedantic -fimplicit-none -fbounds-check
 
 # List of includes for the compiler
 includes = -I/usr/include/
-libs = -lfftw3 -lm
+
+# for the serial version
+#libs = -lfftw3 -lm
+
+# for the multi-threaded version
+libs = -lfftw3_threads -lfftw3 -lm -lpthread
 
 # Makefile
 filter_en.out: filter_en.o subroutines.o global.o ode_path.o nrtype.o

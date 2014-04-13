@@ -22,6 +22,12 @@ contains
   subroutine create_fftw
     implicit none
 
+    integer iret ! fftw multi-thread initialization return code
+
+    call fftw_init_threads(iret)
+    write(*,*) iret
+    call fftw_plan_with_nthreads(8)
+
     ! fft stuff
     dimx=size(pdb,1)
     dimy=size(pdb,2)
@@ -58,6 +64,8 @@ contains
     call fftw_free(q)
     call fftw_free(r)
     call fftw_free(s)
+
+    call fftw_cleanup_threads()
 
   end subroutine destroy_fftw
 
