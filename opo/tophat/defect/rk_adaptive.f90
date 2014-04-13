@@ -6,6 +6,7 @@ MODULE rk_adaptive
 CONTAINS
 
   Subroutine derivs(x,y,dydx)
+  ! TODO: implement multi-threading fftw
 
     USE FFTW3
     IMPLICIT NONE
