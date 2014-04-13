@@ -4,8 +4,7 @@ Module subroutines
   SAVE
 CONTAINS
 
-  Subroutine read
-  ! TODO: change subroutine name
+  Subroutine read_input
     IMPLICIT NONE
 
     OPEN(UNIT=22,FILE='INPUT',STATUS='old')
@@ -17,7 +16,7 @@ CONTAINS
     norm=ax*ay    
     f_p=f_p*256/sqrt(Nx*Ny*1.0)*sqrt(Lx*Ly*1.0)/70    
 
-  end Subroutine read
+  end Subroutine read_input
 
   SUBROUTINE  init_pdb
     IMPLICIT NONE

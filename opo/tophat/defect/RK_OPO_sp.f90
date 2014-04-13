@@ -23,7 +23,7 @@
         dimt=size(y_tot_0,3)
 
         open(unit=file_time_0, file="times_0.dat", status='replace')
-        call read
+        call read_input
         tot_h=t_stfft+(Nt+1)*(dxsav_sp)
 
         allocate(pdb(Nx,Ny,2), kinetic(Nx,Ny), pot_c(Nx,Ny), pump_spatial(Nx,Ny))

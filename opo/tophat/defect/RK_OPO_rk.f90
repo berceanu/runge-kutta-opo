@@ -8,7 +8,7 @@
         real(8), EXTERNAL ::  findfermpart,findcoopernum
         complex(8), EXTERNAL :: findfermcond1, findfermcond2
 
-        call read
+        call read_input
 
         allocate(pdb(Nx,Ny,2), kinetic(Nx,Ny), pot_c(Nx,Ny), pump_spatial(Nx,Ny))
         allocate(pump(Nx,Ny))
