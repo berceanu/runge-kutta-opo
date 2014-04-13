@@ -328,7 +328,7 @@ CONTAINS
              C6=512.0/1771.0,DC1=C1-2825.0/27648.0,&
              DC3=C3-18575.0/48384.0,DC4=C4-13525.0/55296.0,&
              DC5=-277.0/14336.0,DC6=C6-0.25
-    ndum=assert_eq(size(y),size(dydx),size(yout),size(yerr),'rkck')
+    ndum=assert_eq(size(y),size(dydx),size(yout),'rkck')
     ytemp=y+B21*h*dydx 
     !First step.
     call derivs(x+A2*h,ytemp,ak2) 
