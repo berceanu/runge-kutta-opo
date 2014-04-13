@@ -3,3 +3,4 @@
 *.o
 *.out
 *.dat
+gprof2dot.py
