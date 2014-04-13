@@ -1,8 +1,15 @@
 # Start of the makefile
 # Defining variables
 f90comp = gfortran
-#switch = -O0 -pg -Wall -Wextra -pedantic -fimplicit-none -fbounds-check -fbacktrace -ffree-line-length-none
-switch = -O3 -Wall -Wextra -ffree-line-length-none
+
+# when compiling for debugging
+switch = -g3 -Wall -Wextra -Wconversion -pedantic -fimplicit-none -fbounds-check -fbacktrace -ffree-line-length-none -ffpe-trap=zero,overflow,underflow
+
+# when compiling for production
+#switch = -O2 -ffree-line-length-none
+
+# when compiling for profiling
+#switch = -O2 -ffree-line-length-none -g -pg -fno-omit-frame-pointer -fno-inline-functions -fno-inline-functions-called-once -fno-optimize-sibling-calls
 
 # List of includes for the compiler
 includes = -I/usr/include/
