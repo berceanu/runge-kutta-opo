@@ -116,14 +116,13 @@ contains
   !calculating the right-hand-side derivative, while rkqs is the name of
   !he stepper routine to be used.
 
-  ! TODO: implement multi-threading fftw
     IMPLICIT NONE    
 
     complex(8), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
     real(8), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
     real(8), PARAMETER :: TINY=1.0e-30    
-    INTEGER(I4B), PARAMETER :: MAXSTP=50000
+    INTEGER(I4B), PARAMETER :: MAXSTP=1000000000
 
     INTEGER(I4B) :: nstp    
     real(8) :: h,hdid,hnext,x,xsav    
