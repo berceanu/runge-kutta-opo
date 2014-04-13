@@ -1,14 +1,12 @@
-MODULE rk_adaptive
-  USE global    
-  IMPLICIT NONE
-  SAVE
+module rk_adaptive
+  use global    
+  implicit none
 
-CONTAINS
+contains
 
-  Subroutine derivs(x,y,dydx)
-
-    USE FFTW3
-    IMPLICIT NONE
+  subroutine derivs(x,y,dydx)
+    use FFTW3
+    implicit none
 
     ! fft stuff
     ! forward means real space to momentum space, backward the opposite
@@ -117,6 +115,7 @@ CONTAINS
     if (save_steps) then    
        xsav=x-2.0*dxsav_rk    
     end if    
+    ! TODO: declare fft arrays and plans here
     do nstp=1,MAXSTP     
     !Take at most MAXSTP steps
        call derivs(x,y,dydx)    

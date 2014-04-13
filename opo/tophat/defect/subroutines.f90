@@ -1,7 +1,7 @@
 Module subroutines
   USE global
   IMPLICIT NONE
-  SAVE
+
 CONTAINS
 
   Subroutine read_input

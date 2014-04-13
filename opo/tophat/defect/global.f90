@@ -25,6 +25,7 @@ Module global
   real(8) :: eps_r, gv, def_x_pos, def_y_pos
   real(8) :: t_stfft
   real(8) :: mom_cent, mom_cut
+  real(8), parameter :: pi=3.141592653589793238462643383279502884197
 
   NAMELIST /indata/               &
        &     run,                  &   ! run from scratch?
