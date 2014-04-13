@@ -1,27 +1,28 @@
 module rk_adaptive
   use global    
+  use FFTW3
   implicit none
+
+  private ! make everything private by default
+
+  ! fft stuff
+  ! forward means real space to momentum space, backward the opposite
+  type(C_PTR) :: plan_forward, plan_backward
+  complex(C_DOUBLE_COMPLEX), pointer :: in_forward(:,:)
+  complex(C_DOUBLE_COMPLEX), pointer :: out_forward(:,:)
+  complex(C_DOUBLE_COMPLEX), pointer :: in_backward(:,:)
+  complex(C_DOUBLE_COMPLEX), pointer :: out_backward(:,:)
+  type(C_PTR) :: p, q, r, s
+  integer(C_INT) :: dimx, dimy
+
+  public :: odeint_rk
 
 contains
 
-  subroutine derivs(x,y,dydx)
-    use FFTW3
+  subroutine create_fftw
     implicit none
 
     ! fft stuff
-    ! forward means real space to momentum space, backward the opposite
-    type(C_PTR) :: plan_forward, plan_backward
-    complex(C_DOUBLE_COMPLEX), pointer :: in_forward(:,:)
-    complex(C_DOUBLE_COMPLEX), pointer :: out_forward(:,:)
-    complex(C_DOUBLE_COMPLEX), pointer :: in_backward(:,:)
-    complex(C_DOUBLE_COMPLEX), pointer :: out_backward(:,:)
-    type(C_PTR) :: p, q, r, s
-    integer(C_INT) :: dimx, dimy  ! array dimensions
-
-    real(8), INTENT(IN) :: x
-    complex(8), DIMENSION(:,:,:), INTENT(IN) :: y
-    complex(8), DIMENSION(:,:,:), INTENT(OUT) :: dydx
-
     dimx=size(pdb,1)
     dimy=size(pdb,2)
 
@@ -30,7 +31,8 @@ contains
     q = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
     r = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
     s = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
- 
+
+    ! make pointers from C to FORTRAN
     ! here we use the usual fortran order
     call c_f_pointer(p, in_forward, [dimx,dimy])
     call c_f_pointer(q, out_forward, [dimx,dimy])
@@ -39,14 +41,38 @@ contains
  
     ! prepare plans needed by fftw3
     ! here we must make sure we reverse the array dimensions for FFTW
-    plan_forward = fftw_plan_dft_2d(dimy, dimx, in_forward, out_forward, FFTW_FORWARD, FFTW_ESTIMATE)
-    plan_backward = fftw_plan_dft_2d(dimy, dimx, in_backward, out_backward, FFTW_BACKWARD, FFTW_ESTIMATE)
+    plan_forward = fftw_plan_dft_2d(dimy, dimx, in_forward, out_forward, FFTW_FORWARD, FFTW_PATIENT)
+    plan_backward = fftw_plan_dft_2d(dimy, dimx, in_backward, out_backward, FFTW_BACKWARD, FFTW_PATIENT)
+
+  end subroutine create_fftw
 
 
+  subroutine destroy_fftw
+    implicit none
+
+    ! avoiding any potential memory leaks
+    call fftw_destroy_plan(plan_forward)
+    call fftw_destroy_plan(plan_backward)
+ 
+    call fftw_free(p)
+    call fftw_free(q)
+    call fftw_free(r)
+    call fftw_free(s)
+
+  end subroutine destroy_fftw
+
+
+  subroutine derivs(x,y,dydx)
+    implicit none
+
+    real(8), INTENT(IN) :: x
+    complex(8), DIMENSION(:,:,:), INTENT(IN) :: y
+    complex(8), DIMENSION(:,:,:), INTENT(OUT) :: dydx
+ 
     !generate the energy dependence of the pump
     pump=pump_spatial*(cos(omega_p*x)+(0.0,-1.0)*sin(omega_p*x))
 
-    !right hand side of the equation of motion for the photon population
+    !right hand side of the equation of motion
 
     !photon part
     dydx(:,:,1)= (0.0,-1.0)*y(:,:,2)-(0.0,1.0)*delta*y(:,:,1)-&
@@ -70,18 +96,18 @@ contains
     out_backward = out_backward/sqrt(real(dimx*dimy)) !normalization
     dydx(:,:,1) = dydx(:,:,1) + out_backward * cmplx(0.0,-1.0)
  
-    ! avoiding any potential memory leaks
-    call fftw_destroy_plan(plan_forward)
-    call fftw_destroy_plan(plan_backward)
- 
-    call fftw_free(p)
-    call fftw_free(q)
-    call fftw_free(r)
-    call fftw_free(s)
-
   END SUBROUTINE derivs
 
   SUBROUTINE odeint_rk(ystart,x1,x2,eps,h1,hmin)
+  !Runge-Kutta driver with adaptive step size control.Integrate the array
+  !of starting values ystart from x1 to x2 with accuracy eps storing
+  !intermediate results in the module variables in ode_path. h1 should be
+  !set as a guessed first stepsize, hmin as the minimum allowed stepsize
+  !(can be zero). On output ystart is replaced by values at the end of the
+  !integration interval. derivs is the user-supplied subroutine for
+  !calculating the right-hand-side derivative, while rkqs is the name of
+  !he stepper routine to be used.
+
   ! TODO: implement multi-threading fftw
     IMPLICIT NONE    
 
@@ -89,22 +115,11 @@ contains
     real(8), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
     real(8), PARAMETER :: TINY=1.0e-30    
-    INTEGER(I4B), PARAMETER :: MAXSTP=1000000
-    !Runge-Kutta driver with adaptive step size control.Integrate the array
-    !of starting values ystart from x1 to x2 with accuracy eps storing
-    !intermediate results in the module variables in ode_path. h1 should be
-    !set as a guessed first stepsize, hmin as the minimum allowed stepsize
-    !(can be zero). On output ystart is replaced by values at the end of the
-    !integration interval. derivs is the user-supplied subroutine for
-    !calculating the right-hand-side derivative, while rkqs is the name of
-    !he stepper routine to be used.
-    
+    INTEGER(I4B), PARAMETER :: MAXSTP=50000
+
     INTEGER(I4B) :: nstp    
     real(8) :: h,hdid,hnext,x,xsav    
     complex(8), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
-    real(8), External :: findfermpart,findcoopernum    
-    complex(8), External :: findfermcond    
-
 
     x=x1    
     h=sign(h1,x2-x1)    
@@ -115,7 +130,7 @@ contains
     if (save_steps) then    
        xsav=x-2.0*dxsav_rk    
     end if    
-    ! TODO: declare fft arrays and plans here
+    call create_fftw
     do nstp=1,MAXSTP     
     !Take at most MAXSTP steps
        call derivs(x,y,dydx)    
@@ -133,17 +148,16 @@ contains
        else    
           nbad=nbad+1    
        end if    
-       if ((x-x2)*(x2-x1) >= 0.0) then    
-       !Are we done?
+       if ((x-x2)*(x2-x1) >= 0.0) then !Are we done?
           ystart(:,:,:)=y(:,:,:)    
-          if (save_steps) call save_a_step_rk     
-          !Save final step.
-          RETURN     
-       !Normal exit.
+          if (save_steps) call save_a_step_rk !Save final step.
+          call destroy_fftw ! clear fft memory
+          RETURN !Normal exit.
        end if    
        if (abs(hnext) < hmin) write(*,*) "stepsize smaller than minimum in odeint"    
        h=hnext    
     end do    
+    call destroy_fftw ! clear fft memory
     write(*,*) "too many steps in odeint"    
   CONTAINS    
     SUBROUTINE save_a_step_rk    
@@ -192,8 +206,6 @@ contains
     INTEGER(I4B) :: nstp    
     real(8) :: h,hdid,hnext,x,xsav    
     complex(8), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
-    real(8), External :: findfermpart,findcoopernum    
-    complex(8), External :: findfermcond    
     x=x1    
     h=sign(h1,x2-x1)    
     nok=0    

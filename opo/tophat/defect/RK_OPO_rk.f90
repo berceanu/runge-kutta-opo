@@ -5,8 +5,6 @@
         IMPLICIT NONE
 
         real(8) :: x1_r,x2_r,h1_r,hmin_r
-        real(8), EXTERNAL ::  findfermpart,findcoopernum
-        complex(8), EXTERNAL :: findfermcond1, findfermcond2
 
         call read_input
 
@@ -38,4 +36,3 @@
         deallocate(pdb, kinetic, pot_c, pump_spatial)
         deallocate(pump)
       end Program RK_OPO_rk
-
