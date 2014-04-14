@@ -74,8 +74,8 @@ contains
     implicit none
 
     real(dp), INTENT(IN) :: x
-    complex(8), DIMENSION(:,:,:), INTENT(IN) :: y
-    complex(8), DIMENSION(:,:,:), INTENT(OUT) :: dydx
+    complex(dpc), DIMENSION(:,:,:), INTENT(IN) :: y
+    complex(dpc), DIMENSION(:,:,:), INTENT(OUT) :: dydx
  
     !generate the energy dependence of the pump
     pump=pump_spatial*(cos(omega_p*x)+(0.0,-1.0)*sin(omega_p*x))
@@ -118,7 +118,7 @@ contains
 
     IMPLICIT NONE    
 
-    complex(8), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
+    complex(dpc), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
     real(dp), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
     real(dp), PARAMETER :: TINY=1.0e-30    
@@ -126,7 +126,7 @@ contains
 
     integer :: nstp    
     real(dp) :: h,hdid,hnext,x,xsav    
-    complex(8), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
+    complex(dpc), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
 
     x=x1    
     h=sign(h1,x2-x1)    
@@ -196,7 +196,7 @@ contains
 
   SUBROUTINE odeint_sp(ystart,x1,x2,eps,h1,hmin)
     IMPLICIT NONE    
-    complex(8), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
+    complex(dpc), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
     real(dp), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
     real(dp), PARAMETER :: TINY=1.0e-30    
@@ -212,7 +212,7 @@ contains
     
     integer :: nstp    
     real(dp) :: h,hdid,hnext,x,xsav    
-    complex(8), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
+    complex(dpc), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
     x=x1    
     h=sign(h1,x2-x1)    
     nok=0    
@@ -269,8 +269,8 @@ contains
 
   SUBROUTINE rkqs(y,dydx,x,htry,eps,yscal,hdid,hnext)    
     IMPLICIT NONE    
-    complex(8), DIMENSION(:,:,:), INTENT(INOUT) :: y    
-    complex(8), DIMENSION(:,:,:), INTENT(IN) :: dydx,yscal    
+    complex(dpc), DIMENSION(:,:,:), INTENT(INOUT) :: y    
+    complex(dpc), DIMENSION(:,:,:), INTENT(IN) :: dydx,yscal    
     real(dp), INTENT(INOUT) :: x    
     real(dp), INTENT(IN) :: htry,eps    
     real(dp), INTENT(OUT) :: hdid,hnext    
@@ -286,7 +286,7 @@ contains
     !user-supplied subroutine that computes the right-hand-side derivatives.    
     integer :: ndum    
     real(dp) :: errmax,h,htemp,xnew    
-    complex(8), DIMENSION(size(y,1),size(y,2),size(y,3)) :: yerr,ytemp    
+    complex(dpc), DIMENSION(size(y,1),size(y,2),size(y,3)) :: yerr,ytemp    
     real(dp), PARAMETER :: SAFETY=0.9,PGROW=-0.2,PSHRNK=-0.25,&    
     ERRCON=1.89e-4    
     !The value ERRCON equals (5/SAFETY)**(1/PGROW),see use below.    
@@ -322,9 +322,9 @@ contains
 
   SUBROUTINE rkck(y,dydx,x,h,yout,yerr)
     IMPLICIT NONE
-    complex(8), DIMENSION(:,:,:), INTENT(IN) :: y,dydx
+    complex(dpc), DIMENSION(:,:,:), INTENT(IN) :: y,dydx
     real(dp), INTENT(IN) :: x,h
-    complex(8), DIMENSION(:,:,:), INTENT(OUT) :: yout,yerr
+    complex(dpc), DIMENSION(:,:,:), INTENT(OUT) :: yout,yerr
     INTEGER, EXTERNAL :: assert_eq
     !Given values for N variables y and their derivatives dydx known at x
     !use the fifth order Cash-Karp Runge-Kutta method to advance the
@@ -334,7 +334,7 @@ contains
     !subroutine derivs(x,y,dydx),which returns derivatives dydx at x
 
     integer :: ndum
-    complex(8), DIMENSION(size(y,1),size(y,2),size(y,3)) :: ak2,ak3,ak4,ak5,ak6,ytemp
+    complex(dpc), DIMENSION(size(y,1),size(y,2),size(y,3)) :: ak2,ak3,ak4,ak5,ak6,ytemp
     real(dp), PARAMETER :: A2=0.2,A3=0.3,A4=0.6,A5=1.0,&
              A6=0.875,B21=0.2,B31=3.0/40.0,B32=9.0/40.0,&
              B41=0.3,B42=-0.9,B43=1.2,B51=-11.0/54.0,&
