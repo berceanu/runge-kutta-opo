@@ -180,9 +180,9 @@ contains
          do ix=1, Nx
             sx=-Lx+(ix-1)*ax
             write(22, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx, sy,&
-                   &real(y(ix,iy,1))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70, aimag(y(ix,iy,1))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70
+                   &real(y(ix,iy,1))*norm_c, aimag(y(ix,iy,1))*norm_c
             write(23, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx, sy,&
-                   &real(y(ix,iy,2))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70, aimag(y(ix,iy,2))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70
+                   &real(y(ix,iy,2))*norm_c, aimag(y(ix,iy,2))*norm_c
          end do
          write(22,*)    
          write(23,*)    

@@ -21,7 +21,7 @@ Module global
   real(dp) :: kappa_C, kappa_X, sigma_p, k_p
   real(dp) :: f_p, omega_p
   real(dp) :: omega_cut_p, omega_s, omega_cut_s, omega_id, omega_cut_id
-  real(dp) :: norm, tot_h
+  real(dp) :: norm, tot_h, norm_c
   real(dp) :: eps_r, gv, def_x_pos, def_y_pos
   real(dp) :: t_stfft
   real(dp) :: mom_cent, mom_cut
@@ -60,5 +60,8 @@ Module global
        &     def_x_pos,            &   ! x coordinate of defect
        &     def_y_pos,            &   ! y coordinate of defect
        &     gv                        ! strength of defect potential
+
+    ! normalization constant
+    norm_c = sqrt(real(Nx*Ny, dp))/256/sqrt(real(Lx*Ly, dp))*70
 
 end Module global

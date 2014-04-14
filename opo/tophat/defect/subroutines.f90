@@ -78,7 +78,7 @@ CONTAINS
           pump_spatial(ix,iy)=f_p*0.5*&    
                ( tanh((1.0/10.0)*( sqrt(sx*sx+sy*sy)+sigma_p ))-&    
                tanh((1.0/10.0)*( sqrt(sx*sx+sy*sy)-sigma_p )) ) + (0.0,0.0)    
-          write(25,*) sx, sy, abs(pump_spatial(ix,iy))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70    
+          write(25,*) sx, sy, abs(pump_spatial(ix,iy))*norm_c    
        end do    
        write(25,*)    
     end do    
@@ -107,7 +107,7 @@ CONTAINS
        do ix=1, Nx    
           sx=-Lx+(ix-1)*ax    
           pump_spatial(ix,iy)=f_p + (0.0,0.0)    
-          write(25,*) sx, sy, abs(pump_spatial(ix,iy))*sqrt(1.0*Nx*Ny)/256/sqrt(Lx*Ly*1.0)*70    
+          write(25,*) sx, sy, abs(pump_spatial(ix,iy))*norm_c    
        end do    
        write(25,*)    
     end do    
