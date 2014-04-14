@@ -257,7 +257,7 @@ contains
       integer :: i_t    
       if( x.ge.t_stfft+kount*dxsav_sp .and. kount+1.le.Nt) then    
          write(file_time_0,*) kount, x    
-         call flush(file_time_0)    
+         flush(file_time_0)    
          i_t=kount+1    
          y_tot_0(:,:,i_t)=y(:,:,1)    
          kount=kount+1    

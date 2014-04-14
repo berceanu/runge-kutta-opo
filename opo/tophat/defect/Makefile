@@ -3,10 +3,10 @@
 f90comp = gfortran
 
 # when compiling for debugging
-#switch = -g3 -Wall -Wextra -Wconversion -pedantic -fimplicit-none -fbounds-check -fbacktrace -ffree-line-length-none -ffpe-trap=zero,overflow,underflow
+switch = -g3 -Wall -Wextra -Wconversion -pedantic -fimplicit-none -fbounds-check -fbacktrace -ffree-line-length-none -ffpe-trap=zero,overflow,underflow -std=f2003
 
 # when compiling for production
-switch = -O3 -ffree-line-length-none
+#switch = -O3 -ffree-line-length-none
 
 # when compiling for profiling
 #switch = -O2 -ffree-line-length-none -g -pg -fno-omit-frame-pointer -fno-inline-functions -fno-inline-functions-called-once -fno-optimize-sibling-calls
