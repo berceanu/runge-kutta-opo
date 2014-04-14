@@ -16,7 +16,7 @@
 
         !initialize wf
         if(run.eq.1) then
-           pdb=(0.0,0.0)
+           pdb=zero
         else if(run.eq.0) then
            write(label,FMT="(i3)") in_sswf_rk
            call init_pdb

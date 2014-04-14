@@ -32,7 +32,7 @@
         !photon potential
         call init_pot_c
 
-        pdb=(0.0,0.0)
+        pdb=zero
         write(label,FMT="(i3)") in_sswf_sp
         !initialize wavefunction
         call init_pdb

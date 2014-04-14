@@ -77,7 +77,7 @@ CONTAINS
           sx=-Lx+(ix-1)*ax    
           pump_spatial(ix,iy)=f_p*0.5*&    
                ( tanh((1.0/10.0)*( sqrt(sx**2+sy**2)+sigma_p ))-&    
-               tanh((1.0/10.0)*( sqrt(sx**2+sy**2)-sigma_p )) ) + (0.0,0.0)    
+               tanh((1.0/10.0)*( sqrt(sx**2+sy**2)-sigma_p )) ) + zero    
           write(25,*) sx, sy, abs(pump_spatial(ix,iy))*norm_c    
        end do    
        write(25,*)    
@@ -106,7 +106,7 @@ CONTAINS
        sy=-Ly+(iy-1)*ay    
        do ix=1, Nx    
           sx=-Lx+(ix-1)*ax    
-          pump_spatial(ix,iy)=f_p + (0.0,0.0)    
+          pump_spatial(ix,iy)=f_p + zero    
           write(25,*) sx, sy, abs(pump_spatial(ix,iy))*norm_c    
        end do    
        write(25,*)    
@@ -230,7 +230,7 @@ CONTAINS
     real(dp) :: omega    
     real(dp) :: mom_x, mom_y
   
-    y_tot_0=(0.0,0.0)    
+    y_tot_0=zero    
   
     !!importing y_tot_0!!    
     open(unit=28, file="spectr_om-vs-k_no-trigg.dat", status='old')    
@@ -356,7 +356,7 @@ CONTAINS
     write(*,*) 'i_tmax_f= ', i_tmax_f    
     write(*,*)    
         
-    y_enfilt=(0.0,0.0)
+    y_enfilt=zero
     
     if ((i_tmax_f-i_tmax_i).eq.1) i_tmax_i=i_tmax_f
 
@@ -453,7 +453,7 @@ CONTAINS
     integer :: kx, ky    
     real(dp) :: mom_x, mom_y    
   
-    wave_f_flt=(0.0,0.0)    
+    wave_f_flt=zero    
     do ky=Ny/2+2, Ny    
        mom_y=pi*(ky-1-Ny)/Ly    
        do kx=Nx/2+2, Nx    
