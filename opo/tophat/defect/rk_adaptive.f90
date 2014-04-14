@@ -89,7 +89,7 @@ contains
     dydx(:,:,1) = dydx(:,:,1)+I*pot_c(:,:)*y(:,:,1)
     !exciton part
     dydx(:,:,2)= -kappa_X*y(:,:,2)-&
-         I*ABS(y(:,:,2))*ABS(y(:,:,2))*y(:,:,2)/norm- &
+         I*ABS(y(:,:,2))**2*y(:,:,2)/norm- &
          &I*y(:,:,1)
 
     !adding the kinetic energy by means of the FFT

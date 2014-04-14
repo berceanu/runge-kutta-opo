@@ -76,8 +76,8 @@ CONTAINS
        do ix=1, Nx    
           sx=-Lx+(ix-1)*ax    
           pump_spatial(ix,iy)=f_p*0.5*&    
-               ( tanh((1.0/10.0)*( sqrt(sx*sx+sy*sy)+sigma_p ))-&    
-               tanh((1.0/10.0)*( sqrt(sx*sx+sy*sy)-sigma_p )) ) + (0.0,0.0)    
+               ( tanh((1.0/10.0)*( sqrt(sx**2+sy**2)+sigma_p ))-&    
+               tanh((1.0/10.0)*( sqrt(sx**2+sy**2)-sigma_p )) ) + (0.0,0.0)    
           write(25,*) sx, sy, abs(pump_spatial(ix,iy))*norm_c    
        end do    
        write(25,*)    
@@ -129,26 +129,26 @@ CONTAINS
         
     DO j=1,(Ny/2+1)    
        DO k=1,(Nx/2+1)    
-          kinetic(k,j)=pi*pi*(&    
-               &(k-1)*(k-1)/(Lx*Lx)+(j-1)*(j-1)/(Ly*Ly))    
+          kinetic(k,j)=pi**2*(&    
+               &(k-1)**2/(Lx**2)+(j-1)**2/(Ly**2))    
        END DO    
     END DO    
     DO j=(Ny/2+2),Ny    
        DO k=(Nx/2+2),Nx    
-          kinetic(k,j)=pi*pi*( &    
-               & (k-1-Nx)*(k-1-Nx)/(Lx*Lx)+(j-1-Ny)*(j-1-Ny)/(Ly*Ly))    
+          kinetic(k,j)=pi**2*( &    
+               & (k-1-Nx)**2/(Lx**2)+(j-1-Ny)**2/(Ly**2))    
        END DO    
     END DO    
     DO j=1,(Ny/2+1)    
        DO k=(Nx/2+2),Nx    
-          kinetic(k,j)=pi*pi*(&    
-               &(k-1-Nx)*(k-1-Nx)/(Lx*Lx)+(j-1)*(j-1)/(Ly*Ly))    
+          kinetic(k,j)=pi**2*(&    
+               &(k-1-Nx)**2/(Lx**2)+(j-1)**2/(Ly**2))    
        END DO    
     END DO    
     DO j=(Ny/2+2),Ny    
        DO k=1,(Nx/2+1)      
-          kinetic(k,j)=pi*pi*(&    
-               &(k-1)*(k-1)/(Lx*Lx)+(j-1-Ny)*(j-1-Ny)/(Ly*Ly))    
+          kinetic(k,j)=pi**2*(&    
+               &(k-1)**2/(Lx**2)+(j-1-Ny)**2/(Ly**2))    
        END DO    
     END DO    
 
@@ -278,11 +278,11 @@ CONTAINS
        omega=2.0*pi*(i_t-1-Nt)/( (Nt-1)*dxsav_sp )    
        do kx=Nx/2+2, Nx    
           mom_x=pi*(kx-1-Nx)/Lx    
-          write(23, *) mom_x, -omega, abs(y_tot_0(kx,1,i_t))*abs(y_tot_0(kx,1,i_t))    
+          write(23, *) mom_x, -omega, abs(y_tot_0(kx,1,i_t))**2    
        end do    
        do kx=1, Nx/2+1    
           mom_x=pi*(kx-1)/Lx    
-          write(23, *) mom_x, -omega, abs(y_tot_0(kx,1,i_t))*abs(y_tot_0(kx,1,i_t))    
+          write(23, *) mom_x, -omega, abs(y_tot_0(kx,1,i_t))**2    
        end do    
        write(23,*)    
     end do    
@@ -290,11 +290,11 @@ CONTAINS
        omega=2.0*pi*(i_t-1)/( (Nt-1)*dxsav_sp )    
        do kx=Nx/2+2, Nx    
           mom_x=pi*(kx-1-Nx)/Lx    
-          write(23, *) mom_x, -omega, abs(y_tot_0(kx,1,i_t))*abs(y_tot_0(kx,1,i_t))    
+          write(23, *) mom_x, -omega, abs(y_tot_0(kx,1,i_t))**2    
        end do    
        do kx=1, Nx/2+1    
           mom_x=pi*(kx-1)/Lx    
-          write(23, *) mom_x, -omega, abs(y_tot_0(kx,1,i_t))*abs(y_tot_0(kx,1,i_t))    
+          write(23, *) mom_x, -omega, abs(y_tot_0(kx,1,i_t))**2    
        end do    
        write(23,*)    
     end do    
@@ -399,12 +399,12 @@ CONTAINS
        do kx=Nx/2+2, Nx    
           mom_x=pi*(kx-1-Nx)/Lx    
           write(27,*) mom_x, mom_y, &    
-               abs(y_enfilt(kx,ky))*abs(y_enfilt(kx,ky))    
+               abs(y_enfilt(kx,ky))**2    
        end do    
        do kx=1, Nx/2+1    
           mom_x=pi*(kx-1)/Lx    
           write(27,*) mom_x, mom_y, &    
-               abs(y_enfilt(kx,ky))*abs(y_enfilt(kx,ky))    
+               abs(y_enfilt(kx,ky))**2    
        end do    
        write(27,*)    
     end do    
@@ -413,12 +413,12 @@ CONTAINS
        do kx=Nx/2+2, Nx    
           mom_x=pi*(kx-1-Nx)/Lx    
           write(27,*) mom_x, mom_y, &    
-               abs(y_enfilt(kx,ky))*abs(y_enfilt(kx,ky))    
+               abs(y_enfilt(kx,ky))**2    
        end do    
        do kx=1, Nx/2+1    
           mom_x=pi*(kx-1)/Lx    
           write(27,*) mom_x, mom_y, &    
-               abs(y_enfilt(kx,ky))*abs(y_enfilt(kx,ky))    
+               abs(y_enfilt(kx,ky))**2    
        end do    
        write(27,*)    
     end do    
@@ -440,7 +440,7 @@ CONTAINS
        sy=-Ly+(iy-1)*ay    
        do ix=1, Nx    
           sx=-Lx+(ix-1)*ax    
-          write(26,*) sx, sy, abs(y_enfilt(ix,iy))*abs(y_enfilt(ix,iy))    
+          write(26,*) sx, sy, abs(y_enfilt(ix,iy))**2    
        end do    
        write(26,*)    
     end do    
@@ -458,13 +458,13 @@ CONTAINS
        mom_y=pi*(ky-1-Ny)/Ly    
        do kx=Nx/2+2, Nx    
           mom_x=pi*(kx-1-Nx)/Lx    
-          if( sqrt((mom_x-mom_cent)*(mom_x-mom_cent)+mom_y*mom_y) .le. mom_cut ) then    
+          if( sqrt((mom_x-mom_cent)**2+mom_y**2) .le. mom_cut ) then    
              wave_f_flt(kx,ky,1) = wave_f_mom(kx,ky,1)    
           end if    
        end do    
        do kx=1, Nx/2+1    
           mom_x=pi*(kx-1)/Lx    
-          if( sqrt((mom_x-mom_cent)*(mom_x-mom_cent)+mom_y*mom_y) .le. mom_cut ) then    
+          if( sqrt((mom_x-mom_cent)**2+mom_y**2) .le. mom_cut ) then    
              wave_f_flt(kx,ky,1) = wave_f_mom(kx,ky,1)    
           end if    
        end do    
@@ -473,13 +473,13 @@ CONTAINS
        mom_y=pi*(ky-1)/Ly    
        do kx=Nx/2+2, Nx    
           mom_x=pi*(kx-1-Nx)/Lx    
-          if( sqrt((mom_x-mom_cent)*(mom_x-mom_cent)+mom_y*mom_y) .le. mom_cut ) then    
+          if( sqrt((mom_x-mom_cent)**2+mom_y**2) .le. mom_cut ) then    
              wave_f_flt(kx,ky,1) = wave_f_mom(kx,ky,1)    
           end if    
        end do    
        do kx=1, Nx/2+1    
           mom_x=pi*(kx-1)/Lx    
-          if( sqrt((mom_x-mom_cent)*(mom_x-mom_cent)+mom_y*mom_y) .le. mom_cut ) then    
+          if( sqrt((mom_x-mom_cent)**2+mom_y**2) .le. mom_cut ) then    
              wave_f_flt(kx,ky,1) = wave_f_mom(kx,ky,1)    
           end if    
        end do    
@@ -499,12 +499,12 @@ CONTAINS
        do kx=Nx/2+2, Nx    
           mom_x=pi*(kx-1-Nx)/Lx    
           write(24,*) mom_x, mom_y,&    
-               abs(wave_f_mom(kx,ky,1))*abs(wave_f_mom(kx,ky,1))    
+               abs(wave_f_mom(kx,ky,1))**2    
        end do    
        do kx=1, Nx/2+1    
           mom_x=pi*(kx-1)/Lx    
           write(24,*) mom_x, mom_y,&    
-               abs(wave_f_mom(kx,ky,1))*abs(wave_f_mom(kx,ky,1))    
+               abs(wave_f_mom(kx,ky,1))**2    
        end do    
        write(24,*)    
     end do    
@@ -513,12 +513,12 @@ CONTAINS
        do kx=Nx/2+2, Nx    
           mom_x=pi*(kx-1-Nx)/Lx    
           write(24,*) mom_x, mom_y,&    
-               abs(wave_f_mom(kx,ky,1))*abs(wave_f_mom(kx,ky,1))    
+               abs(wave_f_mom(kx,ky,1))**2    
        end do    
        do kx=1, Nx/2+1    
           mom_x=pi*(kx-1)/Lx    
           write(24,*) mom_x, mom_y,&    
-               abs(wave_f_mom(kx,ky,1))*abs(wave_f_mom(kx,ky,1))    
+               abs(wave_f_mom(kx,ky,1))**2    
        end do    
        write(24,*)    
     end do    
@@ -532,12 +532,12 @@ CONTAINS
     do kx=Nx/2+2, Nx    
        mom_x=pi*(kx-1-Nx)/Lx    
        write(25,*) mom_x, mom_y,&    
-            abs(wave_f_mom(kx,ky,1))*abs(wave_f_mom(kx,ky,1))    
+            abs(wave_f_mom(kx,ky,1))**2    
     end do    
     do kx=1, Nx/2+1    
        mom_x=pi*(kx-1)/Lx    
        write(25,*) mom_x, mom_y,&    
-            abs(wave_f_mom(kx,ky,1))*abs(wave_f_mom(kx,ky,1))    
+            abs(wave_f_mom(kx,ky,1))**2    
     end do    
     close(25)    
 
