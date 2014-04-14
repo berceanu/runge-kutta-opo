@@ -14,7 +14,7 @@ CONTAINS
     ax=2.0*Lx/Nx    
     ay=2.0*Ly/Ny    
     norm=ax*ay    
-    f_p=f_p*256/sqrt(Nx*Ny*1.0)*sqrt(Lx*Ly*1.0)/70    
+    f_p=f_p*(1/norm_c)    
 
   end Subroutine read_input
 
@@ -35,11 +35,11 @@ CONTAINS
           read(23, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx, sy, re_y2, im_y2
         
           pdb(ix,iy,1)=&    
-               one*re_y1*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70+&    
-               I*im_y1*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70    
+               one*re_y1*(1/norm_c)+&    
+               I*im_y1*(1/norm_c)    
           pdb(ix,iy,2)=&    
-               one*re_y2*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70+&    
-               I*im_y2*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70    
+               one*re_y2*(1/norm_c)+&    
+               I*im_y2*(1/norm_c)    
       end do    
        read(22,*)    
        read(23,*)    
