@@ -35,11 +35,11 @@ CONTAINS
           read(23, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx, sy, re_y2, im_y2
         
           pdb(ix,iy,1)=&    
-               (1.0,0.0)*re_y1*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70+&    
-               (0.0,1.0)*im_y1*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70    
+               one*re_y1*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70+&    
+               I*im_y1*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70    
           pdb(ix,iy,2)=&    
-               (1.0,0.0)*re_y2*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70+&    
-               (0.0,1.0)*im_y2*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70    
+               one*re_y2*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70+&    
+               I*im_y2*256/sqrt(1.0*Nx*Ny)*sqrt(Lx*Ly*1.0)/70    
       end do    
        read(22,*)    
        read(23,*)    
@@ -88,7 +88,7 @@ CONTAINS
        !sy=-Ly+(iy-1)*ay    
        do ix=1, Nx    
           sx=-Lx+(ix-1)*ax    
-          pump_spatial(ix,iy)= pump_spatial(ix,iy)*cos(k_p*sx)+(0.0,1.0)*pump_spatial(ix,iy)*sin(k_p*sx)    
+          pump_spatial(ix,iy)= pump_spatial(ix,iy)*cos(k_p*sx)+I*pump_spatial(ix,iy)*sin(k_p*sx)    
        end do    
     end do
 
@@ -117,7 +117,7 @@ CONTAINS
        !sy=-Ly+(iy-1)*ay    
        do ix=1, Nx    
           sx=-Lx+(ix-1)*ax    
-          pump_spatial(ix,iy)= pump_spatial(ix,iy)*cos(k_p*sx)+(0.0,1.0)*pump_spatial(ix,iy)*sin(k_p*sx)    
+          pump_spatial(ix,iy)= pump_spatial(ix,iy)*cos(k_p*sx)+I*pump_spatial(ix,iy)*sin(k_p*sx)    
        end do    
     end do
 
@@ -240,21 +240,21 @@ CONTAINS
        do ky=Ny/2+2, Ny  
           do kx=Nx/2+2, Nx    
              read(28,101) mom_x, mom_y, omega, re_y_tot_0, im_y_tot_0    
-             y_tot_0(kx,ky,i_t)=(1.0,0.0)*re_y_tot_0+(0.0,1.0)*im_y_tot_0    
+             y_tot_0(kx,ky,i_t)=one*re_y_tot_0+I*im_y_tot_0    
           end do    
           do kx=1, Nx/2+1    
              read(28,101) mom_x, mom_y, omega, re_y_tot_0, im_y_tot_0    
-             y_tot_0(kx,ky,i_t)=(1.0,0.0)*re_y_tot_0+(0.0,1.0)*im_y_tot_0    
+             y_tot_0(kx,ky,i_t)=one*re_y_tot_0+I*im_y_tot_0    
           end do    
        end do    
        do ky=1, Ny/2+1    
           do kx=Nx/2+2, Nx    
              read(28,101) mom_x, mom_y, omega, re_y_tot_0, im_y_tot_0    
-             y_tot_0(kx,ky,i_t)=(1.0,0.0)*re_y_tot_0+(0.0,1.0)*im_y_tot_0    
+             y_tot_0(kx,ky,i_t)=one*re_y_tot_0+I*im_y_tot_0    
           end do    
           do kx=1, Nx/2+1    
              read(28,101) mom_x, mom_y, omega, re_y_tot_0, im_y_tot_0    
-             y_tot_0(kx,ky,i_t)=(1.0,0.0)*re_y_tot_0+(0.0,1.0)*im_y_tot_0    
+             y_tot_0(kx,ky,i_t)=one*re_y_tot_0+I*im_y_tot_0    
           end do    
        end do    
     end do    
