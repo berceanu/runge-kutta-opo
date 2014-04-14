@@ -1,4 +1,4 @@
-      Program RK_OPO_rk
+      program RK_OPO_rk
         USE global
         USE subroutines
         USE rk_adaptive
@@ -7,6 +7,8 @@
         real(dp) :: x1_r,x2_r,h1_r,hmin_r
 
         call read_input
+        ! normalization constant
+        norm_c = sqrt(real(Nx*Ny, dp))/256/sqrt(real(Lx*Ly, dp))*70
 
         allocate(pdb(Nx,Ny,2), kinetic(Nx,Ny), pot_c(Nx,Ny), pump_spatial(Nx,Ny))
         allocate(pump(Nx,Ny))
@@ -31,8 +33,8 @@
         x2_r=tot_h
         h1_r=0.001_dp
         hmin_r=0
-        CALL odeint_rk(pdb,x1_r,x2_r,eps_r,h1_r,hmin_r)
+        call odeint_rk(pdb,x1_r,x2_r,eps_r,h1_r,hmin_r)
 
         deallocate(pdb, kinetic, pot_c, pump_spatial)
         deallocate(pump)
-      end Program RK_OPO_rk
+      end program RK_OPO_rk

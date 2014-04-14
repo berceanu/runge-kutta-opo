@@ -1,4 +1,4 @@
-Module global
+module global
   USE ode_path
   implicit none
   character (len=3) :: label
@@ -61,7 +61,4 @@ Module global
        &     def_y_pos,            &   ! y coordinate of defect
        &     gv                        ! strength of defect potential
 
-    ! normalization constant
-    norm_c = sqrt(real(Nx*Ny, dp))/256/sqrt(real(Lx*Ly, dp))*70
-
-end Module global
+end module global
