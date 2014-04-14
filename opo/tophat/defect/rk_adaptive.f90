@@ -78,19 +78,19 @@ contains
     complex(dpc), DIMENSION(:,:,:), INTENT(OUT) :: dydx
  
     !generate the energy dependence of the pump
-    pump=pump_spatial*(cos(omega_p*x)+(0.0,-1.0)*sin(omega_p*x))
+    pump=pump_spatial*(cos(omega_p*x)-I*sin(omega_p*x))
 
     !right hand side of the equation of motion
 
     !photon part
-    dydx(:,:,1)= (0.0,-1.0)*y(:,:,2)-I*delta*y(:,:,1)-&
-         kappa_C*y(:,:,1)+(0.0,-1.0)*pump(:,:)
+    dydx(:,:,1)= -I*y(:,:,2)-I*delta*y(:,:,1)-&
+         kappa_C*y(:,:,1)-I*pump(:,:)
     !add a potential to the photon part
     dydx(:,:,1) = dydx(:,:,1)+I*pot_c(:,:)*y(:,:,1)
     !exciton part
-    dydx(:,:,2)= -kappa_X*y(:,:,2)+&
-         (0.0,-1.0)*ABS(y(:,:,2))*ABS(y(:,:,2))*y(:,:,2)/norm+ &
-         &(0.0,-1.0)*y(:,:,1)
+    dydx(:,:,2)= -kappa_X*y(:,:,2)-&
+         I*ABS(y(:,:,2))*ABS(y(:,:,2))*y(:,:,2)/norm- &
+         &I*y(:,:,1)
 
     !adding the kinetic energy by means of the FFT
 
@@ -102,7 +102,7 @@ contains
     !fft back to real space
     call fftw_execute_dft(plan_backward, in_backward, out_backward)
     out_backward = out_backward/sqrt(real(dimx*dimy, dp)) !normalization
-    dydx(:,:,1) = dydx(:,:,1) + out_backward * (0.0,-1.0)
+    dydx(:,:,1) = dydx(:,:,1) - I * out_backward
  
   END SUBROUTINE derivs
 
