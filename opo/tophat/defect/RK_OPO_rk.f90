@@ -27,10 +27,10 @@
 
         call setg
 
-        x1_r=0.0
+        x1_r=0
         x2_r=tot_h
-        h1_r=0.001
-        hmin_r=0.0
+        h1_r=0.001_dp
+        hmin_r=0
         CALL odeint_rk(pdb,x1_r,x2_r,eps_r,h1_r,hmin_r)
 
         deallocate(pdb, kinetic, pot_c, pump_spatial)

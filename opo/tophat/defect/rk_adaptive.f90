@@ -135,7 +135,7 @@ contains
     kount=0    
     y(:,:,:)=ystart(:,:,:)    
     if (save_steps) then    
-       xsav=x-2.0*dxsav_rk    
+       xsav=x-2*dxsav_rk    
     end if    
     call create_fftw
     do nstp=1,MAXSTP     
@@ -147,7 +147,7 @@ contains
        if (save_steps .and. (abs(x-xsav) > abs(dxsav_rk))) &     
        !Store intermediate results.
             call save_a_step_rk    
-       if ((x+h-x2)*(x+h-x1) > 0.0) h=x2-x     
+       if ((x+h-x2)*(x+h-x1) > 0) h=x2-x     
        !If stepsize can overshoot,decrease.
        call rkqs(y,dydx,x,h,eps,yscal,hdid,hnext)    
        if (hdid == h) then    
@@ -155,7 +155,7 @@ contains
        else    
           nbad=nbad+1    
        end if    
-       if ((x-x2)*(x2-x1) >= 0.0) then !Are we done?
+       if ((x-x2)*(x2-x1) >= 0) then !Are we done?
           ystart(:,:,:)=y(:,:,:)    
           if (save_steps) call save_a_step_rk !Save final step.
           call destroy_fftw ! clear fft memory
@@ -199,7 +199,7 @@ contains
     complex(dpc), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
     real(dp), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
-    real(dp), PARAMETER :: TINY=1.0e-30
+    real(dp), PARAMETER :: TINY=1.0e-30_dp
     integer, PARAMETER :: MAXSTP=1000000000
     !Runge-Kutta driver with adaptive step size control.Integrate the array
     !of starting values ystart from x1 to x2 with accuracy eps storing
@@ -220,7 +220,7 @@ contains
     kount=0    
     y(:,:,:)=ystart(:,:,:)    
     if (save_steps) then    
-       xsav=x-2.0*dxsav_sp    
+       xsav=x-2*dxsav_sp    
     end if    
     do nstp=1,MAXSTP
     !Take at most MAXSTP steps.
@@ -232,7 +232,7 @@ contains
        !Store intermediate results.
           call save_a_step_sp    
        end if    
-       if ((x+h-x2)*(x+h-x1) > 0.0) h=x2-x     
+       if ((x+h-x2)*(x+h-x1) > 0) h=x2-x     
        !If stepsize can overshoot,decrease.
        call rkqs(y,dydx,x,h,eps,yscal,hdid,hnext)    
        if (hdid == h) then    
@@ -240,7 +240,7 @@ contains
        else    
           nbad=nbad+1    
        end if    
-       if ((x-x2)*(x2-x1) >= 0.0) then     
+       if ((x-x2)*(x2-x1) >= 0) then     
        !Are we done?
           ystart(:,:,:)=y(:,:,:)    
           if (save_steps) call save_a_step_sp     
@@ -298,7 +298,7 @@ contains
        !Take a step.    
     errmax=maxval(abs(yerr(:,:,:)/yscal(:,:,:)))/eps     
     !Evaluate accuracy.    
-       if (errmax <= 1.0) exit     
+       if (errmax <= 1) exit     
        !Step succeeded.    
        htemp=SAFETY*h*(errmax**PSHRNK)     
        !Truncation error too large, reduce stepsize.    
@@ -313,7 +313,7 @@ contains
        hnext=SAFETY*h*(errmax**PGROW)     
     else     
        !No more han a fac or of 5 increase.    
-       hnext=5.0*h    
+       hnext=5*h    
     end if    
     hdid=h      
     x=x+h       

@@ -11,8 +11,8 @@ CONTAINS
     READ(22,NML=indata)
     CLOSE(22)
     
-    ax=2.0*Lx/Nx    
-    ay=2.0*Ly/Ny    
+    ax=2*Lx/Nx    
+    ay=2*Ly/Ny    
     norm=ax*ay    
     f_p=f_p*(1/norm_c)    
 
@@ -58,7 +58,7 @@ CONTAINS
     iy = int((def_y_pos+Ly)/ay + 1)
     !for old coordinates of (Nx/2,Ny/2) set def_x_pos = -ax, def_y_pos=-ay
 
-    pot_c = 0.0
+    pot_c = 0
     pot_c(ix,iy)=gv
 
   end Subroutine init_pot_c
@@ -76,8 +76,8 @@ CONTAINS
        do ix=1, Nx    
           sx=-Lx+(ix-1)*ax    
           pump_spatial(ix,iy)=f_p*0.5*&    
-               ( tanh((1.0/10.0)*( sqrt(sx**2+sy**2)+sigma_p ))-&    
-               tanh((1.0/10.0)*( sqrt(sx**2+sy**2)-sigma_p )) ) + zero    
+               ( tanh((1.0_dp/10)*( sqrt(sx**2+sy**2)+sigma_p ))-&    
+               tanh((1.0_dp/10)*( sqrt(sx**2+sy**2)-sigma_p )) ) + zero    
           write(25,*) sx, sy, abs(pump_spatial(ix,iy))*norm_c    
        end do    
        write(25,*)    
@@ -167,7 +167,7 @@ CONTAINS
     write(28, fmt=' ("#", 1x, "mom_x", 12x, "mom_y", 12x, "omega", 12x, "real(y_tot_0)", 1x, "aimag(y_tot_0)") ')         
   
     do i_t=Nt/2+2, Nt    
-       omega=2.0*pi*(i_t-1-Nt)/( (Nt-1)*dxsav_sp )    
+       omega=2*pi*(i_t-1-Nt)/( (Nt-1)*dxsav_sp )    
        do ky=Ny/2+2, Ny  
           mom_y=pi*(ky-1-Ny)/Ly    
           do kx=Nx/2+2, Nx    
@@ -192,7 +192,7 @@ CONTAINS
     end do    
     end do    
     do i_t=1, Nt/2+1    
-       omega=2.0*pi*(i_t-1)/( (Nt-1)*dxsav_sp )    
+       omega=2*pi*(i_t-1)/( (Nt-1)*dxsav_sp )    
        do ky=Ny/2+2, Ny  
           mom_y=pi*(ky-1-Ny)/Ly    
           do kx=Nx/2+2, Nx    
@@ -275,7 +275,7 @@ CONTAINS
     open(unit=23, file="spectr_om-vs-kx_no-trigg.dat", status='replace')    
     write(23, fmt=' ("#", 1x, "mom_x", 19x, "omega", 19x, "abs(psi(1))**2") ')    
     do i_t=Nt/2+2, Nt    
-       omega=2.0*pi*(i_t-1-Nt)/( (Nt-1)*dxsav_sp )    
+       omega=2*pi*(i_t-1-Nt)/( (Nt-1)*dxsav_sp )    
        do kx=Nx/2+2, Nx    
           mom_x=pi*(kx-1-Nx)/Lx    
           write(23, *) mom_x, -omega, abs(y_tot_0(kx,1,i_t))**2    
@@ -287,7 +287,7 @@ CONTAINS
        write(23,*)    
     end do    
     do i_t=1, Nt/2+1    
-       omega=2.0*pi*(i_t-1)/( (Nt-1)*dxsav_sp )    
+       omega=2*pi*(i_t-1)/( (Nt-1)*dxsav_sp )    
        do kx=Nx/2+2, Nx    
           mom_x=pi*(kx-1-Nx)/Lx    
           write(23, *) mom_x, -omega, abs(y_tot_0(kx,1,i_t))**2    
@@ -305,11 +305,11 @@ CONTAINS
     write(24, fmt=' ("#", 1x, "omega", 20x, "int_omega") ')    
     int_sp=sum(sum(abs(y_tot_0), dim=1), dim=1)    
     do i_t=Nt/2+2, Nt    
-       omega=2.0*pi*(i_t-1-Nt)/( (Nt-1)*dxsav_sp )    
+       omega=2*pi*(i_t-1-Nt)/( (Nt-1)*dxsav_sp )    
        write(24, *) -omega, int_sp(i_t)    
     end do    
     do i_t=1, Nt/2+1    
-       omega=2.0*pi*(i_t-1)/( (Nt-1)*dxsav_sp )    
+       omega=2*pi*(i_t-1)/( (Nt-1)*dxsav_sp )    
        write(24, *) -omega, int_sp(i_t)    
     end do    
     close(24)    
@@ -331,7 +331,7 @@ CONTAINS
     write(*,*) 'omega= ', omega
 
     !find index of peak
-    i_tmax = int(1 + Nt/2 + omega/(2.0*pi) * (Nt-1)*dxsav_sp)
+    i_tmax = int(1 + Nt/2 + omega/(2*pi) * (Nt-1)*dxsav_sp)
     if ((i_tmax.lt.1).or.(i_tmax.gt.Nt)) then
         write(*,*) "index of "//trim(adjustl(lbl))//" peak out of range!"
     end if
@@ -339,14 +339,14 @@ CONTAINS
     !calculating indices of energy window
     omega_i = omega - omega_cut
     write(*,*) 'omega_i= ', omega_i
-    i_tmax_i = int(1 + Nt/2 + omega_i/(2.0*pi) * (Nt-1)*dxsav_sp)
+    i_tmax_i = int(1 + Nt/2 + omega_i/(2*pi) * (Nt-1)*dxsav_sp)
     if ((i_tmax_i.lt.1).or.(i_tmax_i.gt.Nt)) then
         write(*,*) "L index of "//trim(adjustl(lbl))//" out of range!"
     end if
 
     omega_f = omega + omega_cut
     write(*,*) 'omega_f= ', omega_f
-    i_tmax_f = int(1 + Nt/2 + omega_f/(2.0*pi) * (Nt-1)*dxsav_sp)
+    i_tmax_f = int(1 + Nt/2 + omega_f/(2*pi) * (Nt-1)*dxsav_sp)
     if ((i_tmax_f.lt.1).or.(i_tmax_f.gt.Nt)) then
         write(*,*) "R index of "//trim(adjustl(lbl))//" out of range!"
     end if
