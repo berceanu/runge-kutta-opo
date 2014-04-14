@@ -22,8 +22,8 @@ CONTAINS
     IMPLICIT NONE
     
     integer :: ix, iy
-    real(8)  :: sx, sy  
-    real(8) :: re_y1, im_y1, re_y2, im_y2
+    real(dp)  :: sx, sy  
+    real(dp) :: re_y1, im_y1, re_y2, im_y2
   
     open(unit=22, file="phcplx-opo_spc"//trim(adjustl(label))//".dat", status='old')    
     read(22, fmt=' ("#", 1x, "x", 12x, "y", 12x, "real(psi(1))", 1x, "aimag(psi(1))") ')    
@@ -67,7 +67,7 @@ CONTAINS
     IMPLICIT NONE
     
     integer :: ix, iy
-    real(8)  :: sx, sy  
+    real(dp)  :: sx, sy  
 		
     !top hat pump    
     open(unit=25, file='pump.dat', status='replace')    
@@ -98,7 +98,7 @@ CONTAINS
     IMPLICIT NONE
     
     integer :: ix, iy
-    real(8)  :: sx, sy  
+    real(dp)  :: sx, sy  
 
     !homogeneous pumping		
     open(unit=25, file='pump.dat', status='replace')    
@@ -159,8 +159,8 @@ CONTAINS
     integer :: i_t    
     integer :: kx, ky    
   
-    real(8) :: omega    
-    real(8) :: mom_x, mom_y    
+    real(dp) :: omega    
+    real(dp) :: mom_x, mom_y    
   
     !export y_tot_0 to file!!    
     open(unit=28, file="spectr_om-vs-k_no-trigg.dat", status='replace')    
@@ -226,9 +226,9 @@ CONTAINS
     integer :: i_t    
     integer :: kx, ky    
   
-    real(8) :: re_y_tot_0, im_y_tot_0    
-    real(8) :: omega    
-    real(8) :: mom_x, mom_y
+    real(dp) :: re_y_tot_0, im_y_tot_0    
+    real(dp) :: omega    
+    real(dp) :: mom_x, mom_y
   
     y_tot_0=(0.0,0.0)    
   
@@ -268,8 +268,8 @@ CONTAINS
     implicit none    
     integer :: i_t    
     integer :: kx
-    real(8) :: omega    
-    real(8) :: mom_x
+    real(dp) :: omega    
+    real(dp) :: mom_x
     
 	!full spectum	
     open(unit=23, file="spectr_om-vs-kx_no-trigg.dat", status='replace')    
@@ -319,13 +319,13 @@ CONTAINS
   Subroutine filter_peak(omega, omega_cut, lbl)
     implicit none    
       
-    real(8), intent (in) :: omega, omega_cut
+    real(dp), intent (in) :: omega, omega_cut
     character(len=*), intent (in) :: lbl
 
     integer :: i_t, num
     integer :: i_tmax, i_tmax_i, i_tmax_f
 
-    real(8) :: omega_i, omega_f
+    real(dp) :: omega_i, omega_f
 
     write(*,*) trim(adjustl(lbl))
     write(*,*) 'omega= ', omega
@@ -374,7 +374,7 @@ CONTAINS
     implicit none    
     character(len=*), intent (in) :: lbl
     
-    real(8) :: mom_x_max
+    real(dp) :: mom_x_max
     
     !write kx of maximum peak emission
     kx_max=maxloc( abs(y_enfilt(:,1)) )    
@@ -389,7 +389,7 @@ CONTAINS
     character(len=*), intent (in) :: lbl
     
     integer :: kx, ky
-    real(8) :: mom_x, mom_y
+    real(dp) :: mom_x, mom_y
   
     !write peak emission in momentum
     open(unit=27, file="opo_ph-mom_enfilt_"//trim(adjustl(lbl))//".dat", status='replace')    
@@ -431,7 +431,7 @@ CONTAINS
     character(len=*), intent (in) :: lbl
     
     integer :: ix, iy
-    real(8) :: sx, sy
+    real(dp) :: sx, sy
 	
     !write peak emission in space    
     open(unit=26, file="opo_ph-spc_enfilt_"//trim(adjustl(lbl))//".dat", status='replace')    
@@ -451,7 +451,7 @@ CONTAINS
   Subroutine mom_filter
     implicit none    
     integer :: kx, ky    
-    real(8) :: mom_x, mom_y    
+    real(dp) :: mom_x, mom_y    
   
     wave_f_flt=(0.0,0.0)    
     do ky=Ny/2+2, Ny    
@@ -490,7 +490,7 @@ CONTAINS
   Subroutine write_momentum
     implicit none    
     integer :: kx, ky    
-    real(8) :: mom_x, mom_y    
+    real(dp) :: mom_x, mom_y    
   
     open(unit=24, file="opo_mom_ph"//trim(adjustl(label))//".dat", status='replace')    
     write(24, fmt=' ("#", 1x, "kx", 12x, "ky", 12x, "|psi(1)|^2") ')    

@@ -4,7 +4,7 @@
         USE rk_adaptive
         IMPLICIT NONE
 
-        real(8) :: x1_r,x2_r,h1_r,hmin_r
+        real(dp) :: x1_r,x2_r,h1_r,hmin_r
 
         call read_input
 

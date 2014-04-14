@@ -9,23 +9,23 @@ Module global
   complex(8), allocatable :: y_tot_0(:,:,:)
   complex(8), allocatable :: pdb(:,:,:)
   complex(8), allocatable :: pump(:,:)
-  real(8), allocatable :: kinetic(:,:), pot_c(:,:)
-  real(8), allocatable :: int_sp(:)
+  real(dp), allocatable :: kinetic(:,:), pot_c(:,:)
+  real(dp), allocatable :: int_sp(:)
   integer :: run, in_sswf_rk, in_sswf_sp
   integer :: kx_max(1)
   integer :: Nx, Ny, Nt
   integer :: file_time_0=29
   integer :: kount_st, kount_end
-  real(8) :: Lx, Ly, ax, ay
-  real(8) :: delta
-  real(8) :: kappa_C, kappa_X, sigma_p, k_p
-  real(8) :: f_p, omega_p
-  real(8) :: omega_cut_p, omega_s, omega_cut_s, omega_id, omega_cut_id
-  real(8) :: norm, tot_h
-  real(8) :: eps_r, gv, def_x_pos, def_y_pos
-  real(8) :: t_stfft
-  real(8) :: mom_cent, mom_cut
-  real(8), parameter :: pi=3.141592653589793238462643383279502884197
+  real(dp) :: Lx, Ly, ax, ay
+  real(dp) :: delta
+  real(dp) :: kappa_C, kappa_X, sigma_p, k_p
+  real(dp) :: f_p, omega_p
+  real(dp) :: omega_cut_p, omega_s, omega_cut_s, omega_id, omega_cut_id
+  real(dp) :: norm, tot_h
+  real(dp) :: eps_r, gv, def_x_pos, def_y_pos
+  real(dp) :: t_stfft
+  real(dp) :: mom_cent, mom_cut
+  real(dp), parameter :: pi=3.141592653589793238462643383279502884197
 
   NAMELIST /indata/               &
        &     run,                  &   ! run from scratch?
