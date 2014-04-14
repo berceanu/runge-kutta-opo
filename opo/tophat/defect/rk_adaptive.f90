@@ -122,9 +122,9 @@ contains
     real(8), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
     real(8), PARAMETER :: TINY=1.0e-30    
-    INTEGER(I4B), PARAMETER :: MAXSTP=1000000000
+    integer, PARAMETER :: MAXSTP=1000000000
 
-    INTEGER(I4B) :: nstp    
+    integer :: nstp    
     real(8) :: h,hdid,hnext,x,xsav    
     complex(8), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
 
@@ -200,7 +200,7 @@ contains
     real(8), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
     real(8), PARAMETER :: TINY=1.0e-30    
-    INTEGER(I4B), PARAMETER :: MAXSTP=1000000000
+    integer, PARAMETER :: MAXSTP=1000000000
     !Runge-Kutta driver with adaptive step size control.Integrate the array
     !of starting values ystart from x1 to x2 with accuracy eps storing
     !intermediate results in the module variables in ode_path. h1 should be
@@ -210,7 +210,7 @@ contains
     !calculating the right-hand-side derivative, while rkqs is the name of
     !he stepper routine to be used.
     
-    INTEGER(I4B) :: nstp    
+    integer :: nstp    
     real(8) :: h,hdid,hnext,x,xsav    
     complex(8), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
     x=x1    
@@ -284,7 +284,7 @@ contains
     !replaced by their new values, hdid is the stepsize that was actually    
     !accomplished, and hnext is the estimated next stepsize. derivs is the    
     !user-supplied subroutine that computes the right-hand-side derivatives.    
-    INTEGER(I4B) :: ndum    
+    integer :: ndum    
     real(8) :: errmax,h,htemp,xnew    
     complex(8), DIMENSION(size(y,1),size(y,2),size(y,3)) :: yerr,ytemp    
     real(8), PARAMETER :: SAFETY=0.9,PGROW=-0.2,PSHRNK=-0.25,&    
@@ -333,7 +333,7 @@ contains
     !using the embedded fourth order method. The user supplies the
     !subroutine derivs(x,y,dydx),which returns derivatives dydx at x
 
-    INTEGER(I4B) :: ndum
+    integer :: ndum
     complex(8), DIMENSION(size(y,1),size(y,2),size(y,3)) :: ak2,ak3,ak4,ak5,ak6,ytemp
     real(8), PARAMETER :: A2=0.2,A3=0.3,A4=0.6,A5=1.0,&
              A6=0.875,B21=0.2,B31=3.0/40.0,B32=9.0/40.0,&
