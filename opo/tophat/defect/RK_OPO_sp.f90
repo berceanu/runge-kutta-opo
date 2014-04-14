@@ -65,7 +65,7 @@
 
         in_forward = y_tot_0
         call fftw_execute_dft(plan_forward, in_forward, out_forward)
-        y_tot_0 = out_forward/sqrt(real(dimx*dimy*dimt))
+        y_tot_0 = out_forward/sqrt(real(dimx*dimy*dimt, dp))
 
         !save time evolution to file for integrating later in energy window
         call export_evolution
