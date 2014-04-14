@@ -121,7 +121,7 @@ contains
     complex(dpc), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
     real(dp), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
-    real(dp), PARAMETER :: TINY=1.0e-30    
+    real(dp), PARAMETER :: TINY=1.0e-30_dp
     integer, PARAMETER :: MAXSTP=1000000000
 
     integer :: nstp    
@@ -199,7 +199,7 @@ contains
     complex(dpc), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
     real(dp), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
-    real(dp), PARAMETER :: TINY=1.0e-30    
+    real(dp), PARAMETER :: TINY=1.0e-30
     integer, PARAMETER :: MAXSTP=1000000000
     !Runge-Kutta driver with adaptive step size control.Integrate the array
     !of starting values ystart from x1 to x2 with accuracy eps storing
@@ -287,8 +287,8 @@ contains
     integer :: ndum    
     real(dp) :: errmax,h,htemp,xnew    
     complex(dpc), DIMENSION(size(y,1),size(y,2),size(y,3)) :: yerr,ytemp    
-    real(dp), PARAMETER :: SAFETY=0.9,PGROW=-0.2,PSHRNK=-0.25,&    
-    ERRCON=1.89e-4    
+    real(dp), PARAMETER :: SAFETY=0.9_dp, PGROW=-0.2_dp, PSHRNK=-0.25_dp,&    
+    ERRCON=1.89e-4_dp    
     !The value ERRCON equals (5/SAFETY)**(1/PGROW),see use below.    
     ndum=assert_eq(size(y),size(dydx),size(yscal),'rkqs')     
     h=htry     
@@ -335,7 +335,7 @@ contains
 
     integer :: ndum
     complex(dpc), DIMENSION(size(y,1),size(y,2),size(y,3)) :: ak2,ak3,ak4,ak5,ak6,ytemp
-    real(dp), PARAMETER :: A2=0.2,A3=0.3,A4=0.6,A5=1.0,&
+    real(dp), PARAMETER :: A2=0.2_dp,A3=0.3_dp,A4=0.6_dp,A5=1.0,&
              A6=0.875,B21=0.2,B31=3.0/40.0,B32=9.0/40.0,&
              B41=0.3,B42=-0.9,B43=1.2,B51=-11.0/54.0,&
              B52=2.5,B53=-70.0/27.0,B54=35.0/27.0,&
