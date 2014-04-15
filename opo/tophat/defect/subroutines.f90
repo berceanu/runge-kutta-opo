@@ -14,6 +14,8 @@ CONTAINS
     ax=2*Lx/Nx    
     ay=2*Ly/Ny    
     norm=ax*ay    
+    norm_c = sqrt(real(Nx*Ny, dp))/256/sqrt(real(Lx*Ly, dp))*70
+
     f_p=f_p*(1/norm_c)    
 
   end Subroutine read_input

@@ -7,8 +7,6 @@
         real(dp) :: x1_r,x2_r,h1_r,hmin_r
 
         call read_input
-        ! normalization constant
-        norm_c = sqrt(real(Nx*Ny, dp))/256/sqrt(real(Lx*Ly, dp))*70
 
         allocate(pdb(Nx,Ny,2), kinetic(Nx,Ny), pot_c(Nx,Ny), pump_spatial(Nx,Ny))
         allocate(pump(Nx,Ny))
