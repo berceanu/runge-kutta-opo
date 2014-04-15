@@ -73,10 +73,6 @@
         !calculate the energy spectrum
         call eval_spectr_0
 
-        deallocate(pdb, kinetic, pot_c, pump_spatial)
-        deallocate(pump)
-        deallocate(y_tot_0, int_sp)
-
         close(file_time_0)
 
         ! avoiding any potential memory leaks

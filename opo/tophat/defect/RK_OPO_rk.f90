@@ -33,6 +33,4 @@
         hmin_r=0
         call odeint_rk(pdb,x1_r,x2_r,eps_r,h1_r,hmin_r)
 
-        deallocate(pdb, kinetic, pot_c, pump_spatial)
-        deallocate(pump)
       end program RK_OPO_rk
