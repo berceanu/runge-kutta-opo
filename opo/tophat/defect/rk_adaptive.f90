@@ -186,69 +186,6 @@ contains
     END SUBROUTINE save_a_step_rk    
   END SUBROUTINE odeint_rk    
 
-  SUBROUTINE odeint_sp(ystart,x1,x2,eps,h1,hmin)
-    complex(dpc), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
-    real(dp), INTENT(IN) :: x1,x2,eps,h1,hmin    
-  
-    real(dp), PARAMETER :: TINY=1.0e-30_dp
-    integer, PARAMETER :: MAXSTP=1000000000
-
-    integer :: nstp    
-    real(dp) :: h,hdid,hnext,x,xsav    
-    complex(dpc), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
-    x=x1    
-    h=sign(h1,x2-x1)    
-    nok=0    
-    nbad=0    
-    kount=0    
-    y(:,:,:)=ystart(:,:,:)    
-    if (save_steps) then    
-       xsav=x-2*dxsav_sp    
-    end if    
-    do nstp=1,MAXSTP
-    !Take at most MAXSTP steps.
-       call derivs(x,y,dydx)    
-       yscal(:,:,:)=abs(y(:,:,:))+abs(h*dydx(:,:,:))+TINY
-       !Scaling used to monitor accuracy. This general purpose choice can be
-       !modified if need be.
-       if (save_steps .and. x.ge.t_stfft ) then    
-       !Store intermediate results.
-          call save_a_step_sp    
-       end if    
-       if ((x+h-x2)*(x+h-x1) > 0.0_dp) h=x2-x     
-       !If stepsize can overshoot,decrease.
-       call rkqs(y,dydx,x,h,eps,yscal,hdid,hnext)    
-       if (hdid == h) then    
-          nok=nok+1    
-       else    
-          nbad=nbad+1    
-       end if    
-       if ((x-x2)*(x2-x1) >= 0.0_dp) then     
-       !Are we done?
-          ystart(:,:,:)=y(:,:,:)    
-          if (save_steps) call save_a_step_sp     
-          !Save final step.
-          RETURN     
-       !Normal exit.
-       end if    
-       if (abs(hnext) < hmin) write(*,*) "stepsize smaller than minimum in odeint"    
-       h=hnext    
-    end do    
-    write(*,*) "too many steps in odeint"    
-  CONTAINS    
-    SUBROUTINE save_a_step_sp    
-      integer :: i_t    
-      if( x.ge.t_stfft+kount*dxsav_sp .and. kount+1.le.Nt) then    
-         write(file_time_0,*) kount, x    
-         flush(file_time_0)    
-         i_t=kount+1    
-         y_tot_0(:,:,i_t)=y(:,:,1)    
-         kount=kount+1    
-      end if    
-      xsav=x    
-    END SUBROUTINE save_a_step_sp    
-  END SUBROUTINE odeint_sp    
-
 
   SUBROUTINE rkqs(y,dydx,x,htry,eps,yscal,hdid,hnext)    
     complex(dpc), DIMENSION(:,:,:), INTENT(INOUT) :: y    
