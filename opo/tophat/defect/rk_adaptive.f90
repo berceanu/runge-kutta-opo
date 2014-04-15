@@ -147,7 +147,7 @@ contains
        if (save_steps .and. (abs(x-xsav) > abs(dxsav_rk))) &     
        !Store intermediate results.
             call save_a_step_rk    
-       if ((x+h-x2)*(x+h-x1) > 0) h=x2-x     
+       if ((x+h-x2)*(x+h-x1) > 0.0_dp) h=x2-x     
        !If stepsize can overshoot,decrease.
        call rkqs(y,dydx,x,h,eps,yscal,hdid,hnext)    
        if (hdid == h) then    
@@ -155,7 +155,7 @@ contains
        else    
           nbad=nbad+1    
        end if    
-       if ((x-x2)*(x2-x1) >= 0) then !Are we done?
+       if ((x-x2)*(x2-x1) >= 0.0_dp) then !Are we done?
           ystart(:,:,:)=y(:,:,:)    
           if (save_steps) call save_a_step_rk !Save final step.
           call destroy_fftw ! clear fft memory
@@ -232,7 +232,7 @@ contains
        !Store intermediate results.
           call save_a_step_sp    
        end if    
-       if ((x+h-x2)*(x+h-x1) > 0) h=x2-x     
+       if ((x+h-x2)*(x+h-x1) > 0.0_dp) h=x2-x     
        !If stepsize can overshoot,decrease.
        call rkqs(y,dydx,x,h,eps,yscal,hdid,hnext)    
        if (hdid == h) then    
@@ -240,7 +240,7 @@ contains
        else    
           nbad=nbad+1    
        end if    
-       if ((x-x2)*(x2-x1) >= 0) then     
+       if ((x-x2)*(x2-x1) >= 0.0_dp) then     
        !Are we done?
           ystart(:,:,:)=y(:,:,:)    
           if (save_steps) call save_a_step_sp     
@@ -296,15 +296,15 @@ contains
     do    
        call rkck(y,dydx,x,h,ytemp,yerr)     
        !Take a step.    
-    errmax=maxval(abs(yerr(:,:,:)/yscal(:,:,:)))/eps     
-    !Evaluate accuracy.    
-       if (errmax <= 1) exit     
+       errmax=maxval(abs(yerr(:,:,:)/yscal(:,:,:)))/eps     
+       !Evaluate accuracy.    
+       if (errmax <= 1.0_dp) exit     
        !Step succeeded.    
        htemp=SAFETY*h*(errmax**PSHRNK)     
        !Truncation error too large, reduce stepsize.    
-       h=sign(max(abs(htemp),0.1*abs(h)),h)     
+       h=sign(max(abs(htemp),0.1_dp*abs(h)),h)     
        !No more than a factor of 10.    
-       xnew=x+h    
+       xnew=x+h
        if (xnew == x) write(*,*)  "stepsize underflow in rkqs"    
     end do    
     !Go back for another try.    
@@ -313,7 +313,7 @@ contains
        hnext=SAFETY*h*(errmax**PGROW)     
     else     
        !No more han a fac or of 5 increase.    
-       hnext=5*h    
+       hnext=5.0_dp*h    
     end if    
     hdid=h      
     x=x+h       
