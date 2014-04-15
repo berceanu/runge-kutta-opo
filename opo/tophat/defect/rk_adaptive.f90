@@ -20,8 +20,6 @@ module rk_adaptive
 contains
 
   subroutine create_fftw
-    implicit none
-
     integer(C_INT) iret ! fftw multi-thread initialization return code
 
     iret = fftw_init_threads()
@@ -54,8 +52,6 @@ contains
 
 
   subroutine destroy_fftw
-    implicit none
-
     ! avoiding any potential memory leaks
     call fftw_destroy_plan(plan_forward)
     call fftw_destroy_plan(plan_backward)
@@ -71,8 +67,6 @@ contains
 
 
   subroutine derivs(x,y,dydx)
-    implicit none
-
     real(dp), INTENT(IN) :: x
     complex(dpc), DIMENSION(:,:,:), INTENT(IN) :: y
     complex(dpc), DIMENSION(:,:,:), INTENT(OUT) :: dydx
@@ -115,8 +109,6 @@ contains
   !integration interval. derivs is the user-supplied subroutine for
   !calculating the right-hand-side derivative, while rkqs is the name of
   !he stepper routine to be used.
-
-    IMPLICIT NONE    
 
     complex(dpc), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
     real(dp), INTENT(IN) :: x1,x2,eps,h1,hmin    
@@ -195,21 +187,12 @@ contains
   END SUBROUTINE odeint_rk    
 
   SUBROUTINE odeint_sp(ystart,x1,x2,eps,h1,hmin)
-    IMPLICIT NONE    
     complex(dpc), DIMENSION(:,:,:), INTENT(INOUT) :: ystart    
     real(dp), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
     real(dp), PARAMETER :: TINY=1.0e-30_dp
     integer, PARAMETER :: MAXSTP=1000000000
-    !Runge-Kutta driver with adaptive step size control.Integrate the array
-    !of starting values ystart from x1 to x2 with accuracy eps storing
-    !intermediate results in the module variables in ode_path. h1 should be
-    !set as a guessed first stepsize, hmin as the minimum allowed stepsize
-    !(can be zero). On output ystart is replaced by values at the end of the
-    !integration interval. derivs is the user-supplied subroutine for
-    !calculating the right-hand-side derivative, while rkqs is the name of
-    !he stepper routine to be used.
-    
+
     integer :: nstp    
     real(dp) :: h,hdid,hnext,x,xsav    
     complex(dpc), DIMENSION(size(ystart,1),size(ystart,2),size(ystart,3)) :: dydx,y,yscal    
@@ -268,7 +251,6 @@ contains
 
 
   SUBROUTINE rkqs(y,dydx,x,htry,eps,yscal,hdid,hnext)    
-    IMPLICIT NONE    
     complex(dpc), DIMENSION(:,:,:), INTENT(INOUT) :: y    
     complex(dpc), DIMENSION(:,:,:), INTENT(IN) :: dydx,yscal    
     real(dp), INTENT(INOUT) :: x    
@@ -321,7 +303,6 @@ contains
   END SUBROUTINE rkqs    
 
   SUBROUTINE rkck(y,dydx,x,h,yout,yerr)
-    IMPLICIT NONE
     complex(dpc), DIMENSION(:,:,:), INTENT(IN) :: y,dydx
     real(dp), INTENT(IN) :: x,h
     complex(dpc), DIMENSION(:,:,:), INTENT(OUT) :: yout,yerr

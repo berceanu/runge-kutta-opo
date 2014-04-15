@@ -5,8 +5,6 @@ Module subroutines
 CONTAINS
 
   Subroutine read_input
-    IMPLICIT NONE
-
     OPEN(UNIT=22,FILE='INPUT',STATUS='old')
     READ(22,NML=indata)
     CLOSE(22)
@@ -21,28 +19,21 @@ CONTAINS
   end Subroutine read_input
 
   SUBROUTINE  init_pdb
-    IMPLICIT NONE
-    
     integer :: ix, iy
     real(dp)  :: sx, sy  
     real(dp) :: re_y1, im_y1, re_y2, im_y2
   
     open(unit=22, file="phcplx-opo_spc"//trim(adjustl(label))//".dat", status='old')    
-    read(22, fmt=' ("#", 1x, "x", 12x, "y", 12x, "real(psi(1))", 1x, "aimag(psi(1))") ')    
+    read(22, *)
     open(unit=23, file="excplx-opo_spc"//trim(adjustl(label))//".dat", status='old')    
-    read(23, fmt=' ("#", 1x, "x", 12x, "y", 12x, "real(psi(2))", 1x, "aimag(psi(2))") ')    
+    read(23, *)
     do iy=1, Ny    
        do ix=1, Nx    
           read(22, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx, sy, re_y1, im_y1
           read(23, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx, sy, re_y2, im_y2
-        
-          pdb(ix,iy,1)=&    
-               one*re_y1*(1/norm_c)+&    
-               I*im_y1*(1/norm_c)    
-          pdb(ix,iy,2)=&    
-               one*re_y2*(1/norm_c)+&    
-               I*im_y2*(1/norm_c)    
-      end do    
+          pdb(ix,iy,1)= one*re_y1*(1/norm_c) + I*im_y1*(1/norm_c)    
+          pdb(ix,iy,2)= one*re_y2*(1/norm_c) + I*im_y2*(1/norm_c)    
+       end do    
        read(22,*)    
        read(23,*)    
     end do    
@@ -52,8 +43,6 @@ CONTAINS
   END SUBROUTINE  init_pdb
 
   Subroutine init_pot_c
-    implicit none
-
     integer ix, iy
 
     ix = int((def_x_pos+Lx)/ax + 1)
@@ -66,8 +55,6 @@ CONTAINS
   end Subroutine init_pot_c
 
   SUBROUTINE  init_pump_th
-    IMPLICIT NONE
-    
     integer :: ix, iy
     real(dp)  :: sx, sy  
 		
@@ -97,8 +84,6 @@ CONTAINS
   END SUBROUTINE  init_pump_th
 
   SUBROUTINE  init_pump_homo
-    IMPLICIT NONE
-    
     integer :: ix, iy
     real(dp)  :: sx, sy  
 
@@ -126,7 +111,6 @@ CONTAINS
   END SUBROUTINE  init_pump_homo
 
   Subroutine setg
-    implicit none        
     integer :: j,k    
         
     DO j=1,(Ny/2+1)    
@@ -157,7 +141,6 @@ CONTAINS
   end subroutine setg
 
   Subroutine export_evolution
-    implicit none
     integer :: i_t    
     integer :: kx, ky    
   
@@ -224,7 +207,6 @@ CONTAINS
   end Subroutine export_evolution    
 
   Subroutine import_evolution
-    implicit none  
     integer :: i_t    
     integer :: kx, ky    
   
@@ -267,13 +249,12 @@ CONTAINS
   end Subroutine import_evolution
 
   Subroutine eval_spectr_0
-    implicit none    
     integer :: i_t    
     integer :: kx
     real(dp) :: omega    
     real(dp) :: mom_x
     
-	!full spectum	
+    !full spectum	
     open(unit=23, file="spectr_om-vs-kx_no-trigg.dat", status='replace')    
     write(23, fmt=' ("#", 1x, "mom_x", 19x, "omega", 19x, "abs(psi(1))**2") ')    
     do i_t=Nt/2+2, Nt    
@@ -319,8 +300,6 @@ CONTAINS
   end Subroutine eval_spectr_0    
 
   Subroutine filter_peak(omega, omega_cut, lbl)
-    implicit none    
-      
     real(dp), intent (in) :: omega, omega_cut
     character(len=*), intent (in) :: lbl
 
@@ -373,7 +352,6 @@ CONTAINS
   end Subroutine filter_peak
 
   Subroutine write_kx_max(lbl) 
-    implicit none    
     character(len=*), intent (in) :: lbl
     
     real(dp) :: mom_x_max
@@ -387,7 +365,6 @@ CONTAINS
   end Subroutine write_kx_max
 
   Subroutine write_peak_mom(lbl)
-    implicit none    
     character(len=*), intent (in) :: lbl
     
     integer :: kx, ky
@@ -429,7 +406,6 @@ CONTAINS
   end Subroutine write_peak_mom
   
   Subroutine write_peak_spc(lbl)
-    implicit none      
     character(len=*), intent (in) :: lbl
     
     integer :: ix, iy
@@ -451,7 +427,6 @@ CONTAINS
   end Subroutine write_peak_spc
   
   Subroutine mom_filter
-    implicit none    
     integer :: kx, ky    
     real(dp) :: mom_x, mom_y    
   
@@ -490,7 +465,6 @@ CONTAINS
   end Subroutine mom_filter    
 
   Subroutine write_momentum
-    implicit none    
     integer :: kx, ky    
     real(dp) :: mom_x, mom_y    
   
