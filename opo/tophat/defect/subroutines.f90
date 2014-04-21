@@ -110,35 +110,6 @@ CONTAINS
 
   END SUBROUTINE  init_pump_homo
 
-  Subroutine setg
-    integer :: j,k    
-        
-    DO j=1,(Ny/2+1)    
-       DO k=1,(Nx/2+1)    
-          kinetic(k,j)=pi**2*(&    
-               &(k-1)**2/(Lx**2)+(j-1)**2/(Ly**2))    
-       END DO    
-    END DO    
-    DO j=(Ny/2+2),Ny    
-       DO k=(Nx/2+2),Nx    
-          kinetic(k,j)=pi**2*( &    
-               & (k-1-Nx)**2/(Lx**2)+(j-1-Ny)**2/(Ly**2))    
-       END DO    
-    END DO    
-    DO j=1,(Ny/2+1)    
-       DO k=(Nx/2+2),Nx    
-          kinetic(k,j)=pi**2*(&    
-               &(k-1-Nx)**2/(Lx**2)+(j-1)**2/(Ly**2))    
-       END DO    
-    END DO    
-    DO j=(Ny/2+2),Ny    
-       DO k=1,(Nx/2+1)      
-          kinetic(k,j)=pi**2*(&    
-               &(k-1)**2/(Lx**2)+(j-1-Ny)**2/(Ly**2))    
-       END DO    
-    END DO    
-
-  end subroutine setg
 
   Subroutine export_evolution
     integer :: i_t    

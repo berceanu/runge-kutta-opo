@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import ConfigParser
 import init_pump
-import kinetosis
 
 
 def find_index(dist_or_mom, side, delta):
@@ -92,6 +91,7 @@ pdb = np.zeros((Ny, Nx, 2), dtype=np.complex128)
 
 pump_spatial = init_pump_th(f_p, sigma_p, k_p, Y, X)
 
+# FIXME: replace setg with direct fortran call
 kinetic = setg(Ny, Nx, KY, KX)
 
 x1_r=0
@@ -102,7 +102,6 @@ hmin_r=0
 #odeint_rk(pdb,x1_r,x2_r,eps_r,h1_r,hmin_r)
 fortran_pump = np.zeros((Ny, Nx), dtype=np.complex128)
 fortran_pump = init_pump.init_pump_th(Nx,Ny,Lx,Ly,a_x,a_y,f_p,sigma_p,k_p)
-cinetic = kinetosis.setg(Nx,Ny,Lx,Ly)
 print 'done'
 
 

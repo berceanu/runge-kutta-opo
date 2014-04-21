@@ -193,7 +193,7 @@ contains
     real(dp), INTENT(INOUT) :: x    
     real(dp), INTENT(IN) :: htry,eps    
     real(dp), INTENT(OUT) :: hdid,hnext    
-    INTEGER, EXTERNAL :: assert_eq    
+    INTEGER :: assert_eq    
     !Fifth order Runge-Kutta step with monitoring of local truncation error    
     !to ensure accuracy and adjust stepsize. Input are the dependent variable    
     !vector y and its derivative dydx at the starting value of the    
@@ -243,7 +243,7 @@ contains
     complex(dpc), DIMENSION(:,:,:), INTENT(IN) :: y,dydx
     real(dp), INTENT(IN) :: x,h
     complex(dpc), DIMENSION(:,:,:), INTENT(OUT) :: yout,yerr
-    INTEGER, EXTERNAL :: assert_eq
+    INTEGER :: assert_eq
     !Given values for N variables y and their derivatives dydx known at x
     !use the fifth order Cash-Karp Runge-Kutta method to advance the
     !solution over an interval h and return the incremented variables as
@@ -287,17 +287,46 @@ contains
     !Estimate error as diference between fourth and fifth order methods.
   END SUBROUTINE rkck
   
+  Subroutine setg
+    integer :: j,k    
+        
+    DO j=1,(Ny/2+1)    
+       DO k=1,(Nx/2+1)    
+          kinetic(k,j)=pi**2*(&    
+               &(k-1)**2/(Lx**2)+(j-1)**2/(Ly**2))    
+       END DO    
+    END DO    
+    DO j=(Ny/2+2),Ny    
+       DO k=(Nx/2+2),Nx    
+          kinetic(k,j)=pi**2*( &    
+               & (k-1-Nx)**2/(Lx**2)+(j-1-Ny)**2/(Ly**2))    
+       END DO    
+    END DO    
+    DO j=1,(Ny/2+1)    
+       DO k=(Nx/2+2),Nx    
+          kinetic(k,j)=pi**2*(&    
+               &(k-1-Nx)**2/(Lx**2)+(j-1)**2/(Ly**2))    
+       END DO    
+    END DO    
+    DO j=(Ny/2+2),Ny    
+       DO k=1,(Nx/2+1)      
+          kinetic(k,j)=pi**2*(&    
+               &(k-1)**2/(Lx**2)+(j-1-Ny)**2/(Ly**2))    
+       END DO    
+    END DO    
+  end subroutine setg
+
+  function assert_eq(n1, n2, n3, string) result(res)
+    integer, intent(in) :: n1,n2,n3  
+    character(len=4), intent(in) :: string  
+    integer :: res 
+  
+    if ((n1 == n2).and.(n2 == n3)) then  
+       res = n1  
+    else  
+       write (*,*) 'nrerror: an assert_eq failed with this tag: ', string
+       stop   
+    end if  
+  end function assert_eq
+
 end MODULE rk_adaptive
-
-function assert_eq(n1, n2, n3, string) result(res)
-  integer, intent(in) :: n1,n2,n3  
-  character(len=4), intent(in) :: string  
-  integer :: res 
-
-  if ((n1 == n2).and.(n2 == n3)) then  
-     res = n1  
-  else  
-     write (*,*) 'nrerror: an assert_eq failed with this tag: ', string
-     stop   
-  end if  
-end function assert_eq
