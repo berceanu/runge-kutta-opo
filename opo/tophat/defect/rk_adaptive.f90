@@ -1,22 +1,22 @@
-module rk_adaptive
-  use global    
-  use FFTW3
+module rk_adaptive_module
+  !use global    
+  !use FFTW3
   implicit none
 
   private ! make everything private by default
 
   ! fft stuff
   ! forward means real space to momentum space, backward the opposite
-  type(C_PTR) :: plan_forward, plan_backward
-  complex(C_DOUBLE_COMPLEX), pointer :: in_forward(:,:)
-  complex(C_DOUBLE_COMPLEX), pointer :: out_forward(:,:)
-  complex(C_DOUBLE_COMPLEX), pointer :: in_backward(:,:)
-  complex(C_DOUBLE_COMPLEX), pointer :: out_backward(:,:)
-  type(C_PTR) :: p, q, r, s
-  integer(C_INT) :: dimx, dimy
+!  type(C_PTR) :: plan_forward, plan_backward
+!  complex(C_DOUBLE_COMPLEX), pointer :: in_forward(:,:)
+!  complex(C_DOUBLE_COMPLEX), pointer :: out_forward(:,:)
+!  complex(C_DOUBLE_COMPLEX), pointer :: in_backward(:,:)
+!  complex(C_DOUBLE_COMPLEX), pointer :: out_backward(:,:)
+!  type(C_PTR) :: p, q, r, s
+!  integer(C_INT) :: dimx, dimy
   real(dp), parameter :: pi=3.141592653589793238462643383279502884197_dp
 
-  public :: odeint_rk
+  public :: odeint_rk, setg
 
 contains
 
@@ -319,7 +319,7 @@ contains
                &(k-1)**2/(Lx**2)+(j-1-Ny)**2/(Ly**2))    
        end do    
     end do    
-  end subroutine setg
+  end subroutine
 
   function assert_eq(n1, n2, n3, string) result(res)
     integer, intent(in) :: n1,n2,n3  
@@ -334,4 +334,4 @@ contains
     end if  
   end function assert_eq
 
-end MODULE rk_adaptive
+end module
