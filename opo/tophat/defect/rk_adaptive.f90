@@ -14,6 +14,7 @@ module rk_adaptive
   complex(C_DOUBLE_COMPLEX), pointer :: out_backward(:,:)
   type(C_PTR) :: p, q, r, s
   integer(C_INT) :: dimx, dimy
+  real(dp), parameter :: pi=3.141592653589793238462643383279502884197_dp
 
   public :: odeint_rk
 
@@ -98,9 +99,9 @@ contains
     out_backward = out_backward/sqrt(real(dimx*dimy, dp)) !normalization
     dydx(:,:,1) = dydx(:,:,1) - I * out_backward
  
-  END SUBROUTINE derivs
+  end subroutine derivs
 
-  SUBROUTINE odeint_rk(ystart,x1,x2,eps,h1,hmin)
+  subroutine odeint_rk(ystart,x1,x2,eps,h1,hmin)
   !Runge-Kutta driver with adaptive step size control.Integrate the array
   !of starting values ystart from x1 to x2 with accuracy eps storing
   !intermediate results in the module variables in ode_path. h1 should be
@@ -159,7 +160,7 @@ contains
     call destroy_fftw ! clear fft memory
     write(*,*) "too many steps in odeint"    
   CONTAINS    
-    SUBROUTINE save_a_step_rk    
+    subroutine save_a_step_rk    
       real(dp) :: sx,sy    
       integer :: ix, iy    
       write(label,FMT="(i3)") kount    
@@ -183,11 +184,11 @@ contains
       close(23)    
       kount=kount+1    
       xsav=x    
-    END SUBROUTINE save_a_step_rk    
-  END SUBROUTINE odeint_rk    
+    end subroutine save_a_step_rk    
+  end subroutine odeint_rk    
 
 
-  SUBROUTINE rkqs(y,dydx,x,htry,eps,yscal,hdid,hnext)    
+  subroutine rkqs(y,dydx,x,htry,eps,yscal,hdid,hnext)    
     complex(dpc), DIMENSION(:,:,:), INTENT(INOUT) :: y    
     complex(dpc), DIMENSION(:,:,:), INTENT(IN) :: dydx,yscal    
     real(dp), INTENT(INOUT) :: x    
@@ -237,9 +238,9 @@ contains
     hdid=h      
     x=x+h       
     y(:,:,:)=ytemp(:,:,:)      
-  END SUBROUTINE rkqs    
+  end subroutine rkqs    
 
-  SUBROUTINE rkck(y,dydx,x,h,yout,yerr)
+  subroutine rkck(y,dydx,x,h,yout,yerr)
     complex(dpc), DIMENSION(:,:,:), INTENT(IN) :: y,dydx
     real(dp), INTENT(IN) :: x,h
     complex(dpc), DIMENSION(:,:,:), INTENT(OUT) :: yout,yerr
@@ -285,35 +286,39 @@ contains
     !Accumulate increments with proper weights.
     yerr=h*(DC1*dydx+DC3*ak3+DC4*ak4+DC5*ak5+DC6*ak6)
     !Estimate error as diference between fourth and fifth order methods.
-  END SUBROUTINE rkck
+  end subroutine rkck
   
-  Subroutine setg
+  subroutine setg(Nx, Ny, Lx, Ly, kinetic)
+    integer, intent(in) :: Nx, Ny
+    real(dp), intent(in) :: Lx, Ly
+    real(dp), dimension(Nx, Ny), intent(out) :: kinetic
+
     integer :: j,k    
         
-    DO j=1,(Ny/2+1)    
-       DO k=1,(Nx/2+1)    
+    do j=1,(Ny/2+1)    
+       do k=1,(Nx/2+1)    
           kinetic(k,j)=pi**2*(&    
                &(k-1)**2/(Lx**2)+(j-1)**2/(Ly**2))    
-       END DO    
-    END DO    
-    DO j=(Ny/2+2),Ny    
-       DO k=(Nx/2+2),Nx    
+       end do    
+    end do    
+    do j=(Ny/2+2),Ny    
+       do k=(Nx/2+2),Nx    
           kinetic(k,j)=pi**2*( &    
                & (k-1-Nx)**2/(Lx**2)+(j-1-Ny)**2/(Ly**2))    
-       END DO    
-    END DO    
-    DO j=1,(Ny/2+1)    
-       DO k=(Nx/2+2),Nx    
+       end do    
+    end do    
+    do j=1,(Ny/2+1)    
+       do k=(Nx/2+2),Nx    
           kinetic(k,j)=pi**2*(&    
                &(k-1-Nx)**2/(Lx**2)+(j-1)**2/(Ly**2))    
-       END DO    
-    END DO    
-    DO j=(Ny/2+2),Ny    
-       DO k=1,(Nx/2+1)      
+       end do    
+    end do    
+    do j=(Ny/2+2),Ny    
+       do k=1,(Nx/2+1)      
           kinetic(k,j)=pi**2*(&    
                &(k-1)**2/(Lx**2)+(j-1-Ny)**2/(Ly**2))    
-       END DO    
-    END DO    
+       end do    
+    end do    
   end subroutine setg
 
   function assert_eq(n1, n2, n3, string) result(res)
