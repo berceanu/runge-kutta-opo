@@ -6,7 +6,7 @@ from numpy import get_include
 from os import system
 
 # compile the fortran modules without linking
-fortran_mod_comp = 'gfortran rk_adaptive.f90 -c -o rk_adaptive.o -O3 -fPIC'
+fortran_mod_comp = 'make rk_adaptive.o'
 print fortran_mod_comp
 system(fortran_mod_comp)
 shared_obj_comp = 'gfortran pyrk_adaptive.f90 -c -o pyrk_adaptive.o -O3 -fPIC'

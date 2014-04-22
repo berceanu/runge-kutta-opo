@@ -3,7 +3,7 @@
 f90comp = gfortran
 
 # when compiling for debugging
-switch = -g3 -Wall -Wextra -Wconversion -pedantic -fimplicit-none -fbounds-check -fbacktrace -ffree-line-length-none -ffpe-trap=zero,overflow,underflow -std=f2003
+switch = -g3 -Wall -Wextra -Wconversion -pedantic -fimplicit-none -fbounds-check -fbacktrace -ffree-line-length-none -ffpe-trap=zero,overflow,underflow -std=f2003 -fPIC
 
 # when compiling for production
 #switch = -O3 -ffree-line-length-none

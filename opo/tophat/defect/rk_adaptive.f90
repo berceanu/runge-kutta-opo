@@ -1,20 +1,19 @@
 module rk_adaptive_module
-  !use global    
-  !use FFTW3
+  use FFTW3
+  use global
   implicit none
 
   private ! make everything private by default
 
   ! fft stuff
   ! forward means real space to momentum space, backward the opposite
-!  type(C_PTR) :: plan_forward, plan_backward
-!  complex(C_DOUBLE_COMPLEX), pointer :: in_forward(:,:)
-!  complex(C_DOUBLE_COMPLEX), pointer :: out_forward(:,:)
-!  complex(C_DOUBLE_COMPLEX), pointer :: in_backward(:,:)
-!  complex(C_DOUBLE_COMPLEX), pointer :: out_backward(:,:)
-!  type(C_PTR) :: p, q, r, s
-!  integer(C_INT) :: dimx, dimy
-  real(dp), parameter :: pi=3.141592653589793238462643383279502884197_dp
+  type(C_PTR) :: plan_forward, plan_backward
+  complex(C_DOUBLE_COMPLEX), pointer :: in_forward(:,:)
+  complex(C_DOUBLE_COMPLEX), pointer :: out_forward(:,:)
+  complex(C_DOUBLE_COMPLEX), pointer :: in_backward(:,:)
+  complex(C_DOUBLE_COMPLEX), pointer :: out_backward(:,:)
+  type(C_PTR) :: p, q, r, s
+  integer(C_INT) :: dimx, dimy
 
   public :: odeint_rk, setg
 
