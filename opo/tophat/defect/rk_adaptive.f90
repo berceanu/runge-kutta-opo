@@ -293,7 +293,8 @@ contains
     real(dp), dimension(Nx, Ny), intent(out) :: kinetic
 
     integer :: j,k    
-        
+    real(dp), parameter :: pi=3.141592653589793238462643383279502884197_dp 
+
     do j=1,(Ny/2+1)    
        do k=1,(Nx/2+1)    
           kinetic(k,j)=pi**2*(&    
