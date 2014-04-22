@@ -3,10 +3,10 @@
 f90comp = gfortran
 
 # when compiling for debugging
-switch = -g3 -Wall -Wextra -Wconversion -pedantic -fimplicit-none -fbounds-check -fbacktrace -ffree-line-length-none -ffpe-trap=zero,overflow,underflow -std=f2003 -fPIC
+#switch = -g3 -Wall -Wextra -Wconversion -pedantic -fimplicit-none -fbounds-check -fbacktrace -ffree-line-length-none -ffpe-trap=zero,overflow,underflow -std=f2003 -fPIC
 
 # when compiling for production
-#switch = -O3 -ffree-line-length-none
+switch = -O2 -ffree-line-length-none -fPIC
 
 # when compiling for profiling
 #switch = -O2 -ffree-line-length-none -g -pg -fno-omit-frame-pointer -fno-inline-functions -fno-inline-functions-called-once -fno-optimize-sibling-calls
@@ -18,18 +18,16 @@ includes = -I/usr/include/
 #libs = -lfftw3 -lm
 
 # for the multi-threaded version
-libs = -lfftw3_threads -lfftw3 -lm -lpthread
+#libs = -lfftw3_threads -lfftw3 -lm -lpthread
 
 # Makefile
 
-subroutines.mod: subroutines.o subroutines.f90
-	$(f90comp) -c $(switch) subroutines.f90
-subroutines.o: global.mod subroutines.f90
-	$(f90comp) -c $(switch) subroutines.f90
+pyrk_adaptive.o: rk_adaptive.mod pyrk_adaptive.f90
+	$(f90comp) -c $(switch) pyrk_adaptive.f90
 rk_adaptive.mod: rk_adaptive.o rk_adaptive.f90
-	$(f90comp) -c $(switch) rk_adaptive.f90 $(includes)
+	$(f90comp) -c $(switch) rk_adaptive.f90
 rk_adaptive.o: global.mod FFTW3.mod rk_adaptive.f90
-	$(f90comp) -c $(switch) rk_adaptive.f90 $(includes)
+	$(f90comp) -c $(switch) rk_adaptive.f90
 global.mod: global.o global.f90
 	$(f90comp) -c $(switch) global.f90
 global.o: ode_path.mod global.f90

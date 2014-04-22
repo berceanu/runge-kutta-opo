@@ -89,6 +89,7 @@ h1_r=0.001
 hmin_r=0
 
 #odeint_rk(pdb,x1_r,x2_r,eps_r,h1_r,hmin_r)
+print kinetic
 print 'done'
 
 

@@ -15,53 +15,52 @@ module rk_adaptive_module
   type(C_PTR) :: p, q, r, s
   integer(C_INT) :: dimx, dimy
 
-  public :: odeint_rk, setg
+  public :: setg
 
 contains
 
   subroutine create_fftw
     integer(C_INT) iret ! fftw multi-thread initialization return code
 
-    iret = fftw_init_threads()
-    write(*,*) iret
-    call fftw_plan_with_nthreads(8)
+    !iret = fftw_init_threads()
+    !call fftw_plan_with_nthreads(8)
 
     ! fft stuff
     dimx=size(pdb,1)
     dimy=size(pdb,2)
 
     ! allocating memory contiguously using C function
-    p = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
-    q = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
-    r = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
-    s = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
+    !p = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
+    !q = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
+    !r = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
+    !s = fftw_alloc_complex(int(dimx*dimy, C_SIZE_T))
 
     ! make pointers from C to FORTRAN
     ! here we use the usual fortran order
-    call c_f_pointer(p, in_forward, [dimx,dimy])
-    call c_f_pointer(q, out_forward, [dimx,dimy])
-    call c_f_pointer(r, in_backward, [dimx,dimy])
-    call c_f_pointer(s, out_backward, [dimx,dimy])
+    !call c_f_pointer(p, in_forward, [dimx,dimy])
+    !call c_f_pointer(q, out_forward, [dimx,dimy])
+    !call c_f_pointer(r, in_backward, [dimx,dimy])
+    !call c_f_pointer(s, out_backward, [dimx,dimy])
  
     ! prepare plans needed by fftw3
     ! here we must make sure we reverse the array dimensions for FFTW
-    plan_forward = fftw_plan_dft_2d(dimy, dimx, in_forward, out_forward, FFTW_FORWARD, FFTW_PATIENT)
-    plan_backward = fftw_plan_dft_2d(dimy, dimx, in_backward, out_backward, FFTW_BACKWARD, FFTW_PATIENT)
+    !plan_forward = fftw_plan_dft_2d(dimy, dimx, in_forward, out_forward, FFTW_FORWARD, FFTW_PATIENT)
+    !plan_backward = fftw_plan_dft_2d(dimy, dimx, in_backward, out_backward, FFTW_BACKWARD, FFTW_PATIENT)
 
   end subroutine create_fftw
 
 
   subroutine destroy_fftw
     ! avoiding any potential memory leaks
-    call fftw_destroy_plan(plan_forward)
-    call fftw_destroy_plan(plan_backward)
+    !call fftw_destroy_plan(plan_forward)
+    !call fftw_destroy_plan(plan_backward)
  
-    call fftw_free(p)
-    call fftw_free(q)
-    call fftw_free(r)
-    call fftw_free(s)
+!    call fftw_free(p)
+!    call fftw_free(q)
+!    call fftw_free(r)
+!    call fftw_free(s)
 
-    call fftw_cleanup_threads()
+    !call fftw_cleanup_threads()
 
   end subroutine destroy_fftw
 
@@ -90,11 +89,11 @@ contains
 
     !fft to momentum space
     in_forward(:,:)=y(:,:,1)
-    call fftw_execute_dft(plan_forward, in_forward, out_forward)
+    !call fftw_execute_dft(plan_forward, in_forward, out_forward)
     out_forward = out_forward/sqrt(real(dimx*dimy, dp)) !normalization
     in_backward=kinetic*out_forward
     !fft back to real space
-    call fftw_execute_dft(plan_backward, in_backward, out_backward)
+    !call fftw_execute_dft(plan_backward, in_backward, out_backward)
     out_backward = out_backward/sqrt(real(dimx*dimy, dp)) !normalization
     dydx(:,:,1) = dydx(:,:,1) - I * out_backward
  
@@ -153,34 +152,32 @@ contains
           call destroy_fftw ! clear fft memory
           RETURN !Normal exit.
        end if    
-       if (abs(hnext) < hmin) write(*,*) "stepsize smaller than minimum in odeint"    
+       !if (abs(hnext) < hmin) write(*,*) "stepsize smaller than minimum in odeint"    
        h=hnext    
     end do    
     call destroy_fftw ! clear fft memory
-    write(*,*) "too many steps in odeint"    
+    !write(*,*) "too many steps in odeint"    
   CONTAINS    
     subroutine save_a_step_rk    
       real(dp) :: sx,sy    
       integer :: ix, iy    
-      write(label,FMT="(i3)") kount    
-      open(unit=22, file="phcplx-opo_spc"//trim(adjustl(label))//".dat", status='replace')    
-      write(22, fmt=' ("#", 1x, "x", 12x, "y", 12x, "real(psi(1))", 1x, "aimag(psi(1))") ')    
-      open(unit=23, file="excplx-opo_spc"//trim(adjustl(label))//".dat", status='replace')    
-      write(23, fmt=' ("#", 1x, "x", 12x, "y", 12x, "real(psi(2))", 1x, "aimag(psi(2))") ')    
+      !write(label,FMT="(i3)") kount    
+      !open(unit=22, file="phcplx-opo_spc"//trim(adjustl(label))//".dat", status='replace')    
+      !write(22, fmt=' ("#", 1x, "x", 12x, "y", 12x, "real(psi(1))", 1x, "aimag(psi(1))") ')    
+      !open(unit=23, file="excplx-opo_spc"//trim(adjustl(label))//".dat", status='replace')    
+      !write(23, fmt=' ("#", 1x, "x", 12x, "y", 12x, "real(psi(2))", 1x, "aimag(psi(2))") ')    
       do iy=1, Ny    
          sy=-Ly+(iy-1)*ay    
          do ix=1, Nx
             sx=-Lx+(ix-1)*ax
-            write(22, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx, sy,&
-                   &real(y(ix,iy,1))*norm_c, aimag(y(ix,iy,1))*norm_c
-            write(23, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx, sy,&
-                   &real(y(ix,iy,2))*norm_c, aimag(y(ix,iy,2))*norm_c
+            !write(22, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx, sy,&
+                   !&real(y(ix,iy,1))*norm_c, aimag(y(ix,iy,1))*norm_c
+            !write(23, fmt=' (1x, d12.5, 1x, d12.5, 1x, d12.5, 1x, d12.5) ') sx, sy,&
+                   !&real(y(ix,iy,2))*norm_c, aimag(y(ix,iy,2))*norm_c
          end do
-         write(22,*)    
-         write(23,*)    
+         !write(22,*)    
+         !write(23,*)    
       end do    
-      close(22)    
-      close(23)    
       kount=kount+1    
       xsav=x    
     end subroutine save_a_step_rk    
@@ -209,7 +206,7 @@ contains
     real(dp), PARAMETER :: SAFETY=0.9_dp, PGROW=-0.2_dp, PSHRNK=-0.25_dp,&    
     ERRCON=1.89e-4_dp    
     !The value ERRCON equals (5/SAFETY)**(1/PGROW),see use below.    
-    ndum=assert_eq(size(y),size(dydx),size(yscal),'rkqs')     
+    !ndum=assert_eq(size(y),size(dydx),size(yscal),'rkqs')     
     h=htry     
     !Set step size to the initial trial value.     
     do    
@@ -224,7 +221,7 @@ contains
        h=sign(max(abs(htemp),0.1_dp*abs(h)),h)     
        !No more than a factor of 10.    
        xnew=x+h
-       if (xnew == x) write(*,*)  "stepsize underflow in rkqs"    
+       !if (xnew == x) write(*,*)  "stepsize underflow in rkqs"    
     end do    
     !Go back for another try.    
     if (errmax > ERRCON) then     
@@ -264,7 +261,7 @@ contains
              C6=512.0_dp/1771.0_dp,DC1=C1-2825.0_dp/27648.0_dp,&
              DC3=C3-18575.0_dp/48384.0_dp,DC4=C4-13525.0_dp/55296.0_dp,&
              DC5=-277.0_dp/14336.0_dp,DC6=C6-0.25_dp
-    ndum=assert_eq(size(y),size(dydx),size(yout),'rkck')
+    !ndum=assert_eq(size(y),size(dydx),size(yout),'rkck')
     ytemp=y+B21*h*dydx 
     !First step.
     call derivs(x+A2*h,ytemp,ak2) 
@@ -321,17 +318,17 @@ contains
     end do    
   end subroutine
 
-  function assert_eq(n1, n2, n3, string) result(res)
-    integer, intent(in) :: n1,n2,n3  
-    character(len=4), intent(in) :: string  
-    integer :: res 
-  
-    if ((n1 == n2).and.(n2 == n3)) then  
-       res = n1  
-    else  
-       write (*,*) 'nrerror: an assert_eq failed with this tag: ', string
-       stop   
-    end if  
-  end function assert_eq
+!  function assert_eq(n1, n2, n3, string) result(res)
+!    integer, intent(in) :: n1,n2,n3  
+!    character(len=4), intent(in) :: string  
+!    integer :: res 
+!  
+!    if ((n1 == n2).and.(n2 == n3)) then  
+!       res = n1  
+!    else  
+!       !write (*,*) 'nrerror: an assert_eq failed with this tag: ', string
+!       stop   
+!    end if  
+!  end function assert_eq
 
 end module

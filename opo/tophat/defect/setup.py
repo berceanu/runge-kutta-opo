@@ -6,10 +6,7 @@ from numpy import get_include
 from os import system
 
 # compile the fortran modules without linking
-fortran_mod_comp = 'make rk_adaptive.o'
-print fortran_mod_comp
-system(fortran_mod_comp)
-shared_obj_comp = 'gfortran pyrk_adaptive.f90 -c -o pyrk_adaptive.o -O3 -fPIC'
+shared_obj_comp = 'make pyrk_adaptive.o'
 print shared_obj_comp
 system(shared_obj_comp)
 
@@ -18,9 +15,9 @@ ext_modules = [Extension(# module name:
                          # source file:
                          ['pyrk_adaptive.pyx'],
                          # other compile args for gcc
-                         extra_compile_args=['-fPIC', '-O3'],
+                         #extra_compile_args=[''],
                          # other files to link to
-                         extra_link_args=['rk_adaptive.o', 'pyrk_adaptive.o'])]
+                         extra_link_args=['FFTW3.o', 'nrtype.o', 'ode_path.o', 'global.o', 'rk_adaptive.o', 'pyrk_adaptive.o'])]
 
 setup(name = 'pyrk_adaptive',
       cmdclass = {'build_ext': build_ext},
