@@ -60,38 +60,38 @@ def init_pump_th(fp, sigmap, kp, Y, X):
 	    * np.exp(1j * kp * X)
 
 
-#def main():
-kappa_C, kappa_X, delta, k_p, omega_p,\
-sigma_p, f_p, Lx, Ly, Nx, Ny, Nt,\
-tot_h, dxsav_rk, eps_r, def_x_pos, def_y_pos, gv = read_input('INPUT.ini')
+def main():
+    kappa_C, kappa_X, delta, k_p, omega_p,\
+    sigma_p, f_p, Lx, Ly, Nx, Ny, Nt,\
+    tot_h, dxsav_rk, eps_r, def_x_pos, def_y_pos, gv = read_input('INPUT.ini')
 
-y, a_y = np.linspace(-Ly, Ly, num=Ny, endpoint=False, retstep=True)
-x, a_x = np.linspace(-Lx, Lx, num=Nx, endpoint=False, retstep=True)
-#norm = a_x * a_y
-X, Y = np.meshgrid(x, y)
+    y, a_y = np.linspace(-Ly, Ly, num=Ny, endpoint=False, retstep=True)
+    x, a_x = np.linspace(-Lx, Lx, num=Nx, endpoint=False, retstep=True)
+    #norm = a_x * a_y
+    X, Y = np.meshgrid(x, y)
+    
+    side_ky = np.pi / a_y
+    side_kx = np.pi / a_x
+    ky, delta_ky = np.linspace(-(2 * (Ny - 1) / float(Ny) - 1) * side_ky, side_ky, num=Ny, retstep=True)
+    kx, delta_kx = np.linspace(-(2 * (Nx - 1) / float(Nx) - 1) * side_kx, side_kx, num=Nx, retstep=True)
+    KX, KY = np.meshgrid(kx, ky)
+    
+    pot_c = init_pot_c(gv, def_y_pos, def_x_pos, Ly, Lx, Ny, Nx, a_y, a_x)
+    pdb = np.zeros((Ny, Nx, 2), dtype=np.complex128)
+    
+    pump_spatial = init_pump_th(f_p, sigma_p, k_p, Y, X)
+    
+    kinetic = pyrk_adaptive.py_setg(Nx, Ny, Lx, Ly)
+    
+    x1_r=0
+    x2_r=tot_h
+    h1_r=0.001
+    hmin_r=0
+    
+    #odeint_rk(pdb,x1_r,x2_r,eps_r,h1_r,hmin_r)
+    print kinetic
+    print 'done'
 
-side_ky = np.pi / a_y
-side_kx = np.pi / a_x
-ky, delta_ky = np.linspace(-(2 * (Ny - 1) / float(Ny) - 1) * side_ky, side_ky, num=Ny, retstep=True)
-kx, delta_kx = np.linspace(-(2 * (Nx - 1) / float(Nx) - 1) * side_kx, side_kx, num=Nx, retstep=True)
-KX, KY = np.meshgrid(kx, ky)
 
-pot_c = init_pot_c(gv, def_y_pos, def_x_pos, Ly, Lx, Ny, Nx, a_y, a_x)
-pdb = np.zeros((Ny, Nx, 2), dtype=np.complex128)
-
-pump_spatial = init_pump_th(f_p, sigma_p, k_p, Y, X)
-
-kinetic = pyrk_adaptive.py_setg(Nx, Ny, Lx, Ly)
-
-x1_r=0
-x2_r=tot_h
-h1_r=0.001
-hmin_r=0
-
-#odeint_rk(pdb,x1_r,x2_r,eps_r,h1_r,hmin_r)
-print kinetic
-print 'done'
-
-
-#if __name__ == "__main__":
-    #main()
+if __name__ == "__main__":
+    main()
