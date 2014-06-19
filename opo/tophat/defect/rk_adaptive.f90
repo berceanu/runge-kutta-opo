@@ -114,7 +114,7 @@ contains
     real(dp), INTENT(IN) :: x1,x2,eps,h1,hmin    
   
     real(dp), PARAMETER :: TINY=1.0e-30_dp
-    integer, PARAMETER :: MAXSTP=2
+    integer, PARAMETER :: MAXSTP=100000
 
     integer :: nstp    
     real(dp) :: h,hdid,hnext,x,xsav    
