@@ -26,7 +26,6 @@ module global
   real(dp) :: t_stfft
   real(dp) :: mom_cent, mom_cut
   real(dp), parameter :: pi=3.141592653589793238462643383279502884197_dp
-  real(dp), PARAMETER :: epsiloneq=1.0e-30_dp
 
   NAMELIST /indata/               &
        &     run,                  &   ! run from scratch?
