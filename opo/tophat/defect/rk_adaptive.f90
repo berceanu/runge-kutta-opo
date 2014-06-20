@@ -142,7 +142,7 @@ contains
        if ((x+h-x2)*(x+h-x1) > 0.0_dp) h=x2-x     
        !If stepsize can overshoot,decrease.
        call rkqs(y,dydx,x,h,eps,yscal,hdid,hnext)    
-       !write(*,*) hdid, hnext
+       write(*,*) hdid, x
        if (abs(hdid-h)<epsiloneq) then    
           nok=nok+1    
        else    
@@ -155,7 +155,6 @@ contains
           RETURN !Normal exit.
        end if    
        if (abs(hnext) < hmin) write(*,*) "stepsize smaller than minimum in odeint"    
-       !write(*,*) h
        h=hnext    
     end do    
     call destroy_fftw ! clear fft memory
@@ -282,7 +281,6 @@ contains
        call rkck(y,dydx,x,h,ytemp,yerr)     
        !Take a step.    
        errmax=maxval(abs(yerr(:,:,:)/yscal(:,:,:)))/eps     
-       !write(*,*) errmax
        !Evaluate accuracy.    
        if (errmax <= 1.0_dp) exit     
        !Step succeeded.    
@@ -304,7 +302,6 @@ contains
     hdid=h      
     x=x+h       
     y(:,:,:)=ytemp(:,:,:)      
-    write(*,*) "exiting rkqs"
   END SUBROUTINE rkqs    
 
   SUBROUTINE rkck(y,dydx,x,h,yout,yerr)
@@ -351,7 +348,6 @@ contains
     !Sixth step.
     yout=y+h*(C1*dydx+C3*ak3+C4*ak4+C6*ak6) 
     !Accumulate increments with proper weights.
-    write(*,*) ak4(1,1,1), ak4(1,1,2)
     yerr=h*(DC1*dydx+DC3*ak3+DC4*ak4+DC5*ak5+DC6*ak6)
     !Estimate error as diference between fourth and fifth order methods.
   END SUBROUTINE rkck
