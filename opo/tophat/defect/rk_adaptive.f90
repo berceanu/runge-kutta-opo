@@ -15,7 +15,7 @@ module rk_adaptive
   type(C_PTR) :: p, q, r, s
   integer(C_INT) :: dimx, dimy
 
-  public :: odeint_rk
+  public :: odeint_rk, odeint_sp
 
 contains
 
@@ -24,7 +24,7 @@ contains
 
     iret = fftw_init_threads()
     write(*,*) iret
-    call fftw_plan_with_nthreads(1)
+    call fftw_plan_with_nthreads(2)
 
     ! fft stuff
     dimx=size(pdb,1)
