@@ -24,7 +24,7 @@ contains
 
     iret = fftw_init_threads()
     !write(*,*) iret
-    call fftw_plan_with_nthreads(2)
+    call fftw_plan_with_nthreads(4)
 
     ! fft stuff
     dimx=size(pdb,1)
