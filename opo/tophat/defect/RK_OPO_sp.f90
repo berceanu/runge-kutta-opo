@@ -16,9 +16,6 @@
         ! array dimensions
         integer(C_INT) :: dimx, dimy, dimt
 
-        dimx=size(y_tot_0,1)
-        dimy=size(y_tot_0,2)
-        dimt=size(y_tot_0,3)
 
         open(unit=file_time_0, file="times_0.dat", status='replace')
         call read_input
@@ -27,6 +24,7 @@
         allocate(pdb(Nx,Ny,2), kinetic(Nx,Ny), pot_c(Nx,Ny), pump_spatial(Nx,Ny))
         allocate(pump(Nx,Ny))
         allocate(y_tot_0(Nx,Ny,Nt), int_sp(Nt))
+
 
         !initialize variables
         !photon potential
@@ -48,6 +46,10 @@
         h1_r=0.001
         hmin_r=0.0
         CALL odeint_sp(pdb,x1_r,x2_r,eps_r,h1_r,hmin_r)
+
+        dimx=size(y_tot_0,1)
+        dimy=size(y_tot_0,2)
+        dimt=size(y_tot_0,3)
 
         ! allocating memory contiguously using C function
         p = fftw_alloc_complex(int(dimx*dimy*dimt, C_SIZE_T))
