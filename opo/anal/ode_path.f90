@@ -1,7 +1,7 @@
-Module ode_path 
-  USE nrtype
-  INTEGER(I4B) :: nok,nbad,kount
-  LOGICAL(LGT), SAVE :: save_steps=.true.
-  REAL(kind=4) :: dxsav_rk, dxsav_sp
-end Module ode_path
+module ode_path
+  use nrtype
+  integer :: nok,nbad,kount
+  logical :: save_steps=.true.
+  real(dp) :: dxsav_rk, dxsav_sp
+end module ode_path
 

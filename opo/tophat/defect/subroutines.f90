@@ -218,7 +218,7 @@ CONTAINS
   
     !!importing y_tot_0!!    
     open(unit=28, file="spectr_om-vs-k_no-trigg.dat", status='old')    
-    read(28, fmt=' ("#", 1x, "mom_x", 12x, "mom_y", 12x, "omega", 12x, "real(y_tot_0)", 1x, "aimag(y_tot_0)") ')         
+    read(28, *)         
 
     do i_t=Nt, 1, -1    
        do ky=Ny/2+2, Ny  

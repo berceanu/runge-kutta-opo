@@ -1,11 +1,7 @@
-Module nrtype
-  INTEGER, PARAMETER :: I4B = SELECTED_INT_KIND(9)
-  INTEGER, PARAMETER :: I2B = SELECTED_INT_KIND(4)
-  INTEGER, PARAMETER :: I1B = SELECTED_INT_KIND(2)
-  INTEGER, PARAMETER :: SP = KIND(1.0)
-  INTEGER, PARAMETER :: DP = KIND(1.0D0)
-  INTEGER, PARAMETER :: SPC = KIND((1.0,1.0))
-  INTEGER, PARAMETER :: DPC = KIND((1.0D0,1.0D0))
-  INTEGER, PARAMETER :: LGT = KIND(.true.)
-  REAL(SP), PARAMETER :: PI=3.141592653589793238462643383279502884197_sp
-end Module nrtype
+module nrtype
+  integer, parameter:: dp=kind(0.d0)             ! double
+  integer, parameter :: dpc = kind((0.d0, 0.d0)) ! double complex
+  complex(dpc), parameter :: one = (1.d0, 0.d0)  ! complex 1
+  complex(dpc), parameter :: I = (0.d0, 1.d0)    ! complex i
+  complex(dpc), parameter :: zero = (0.d0, 0.d0) ! complex 0
+end module nrtype

@@ -1,19 +1,29 @@
 # Start of the makefile
 # Defining variables
-f90comp = ifort
-switch = -r8
+f90comp = gfortran
 
-# List of includes for the compiler 
-NAG_PATH=/opt/NAG/fnl6i04dcl
-NAG_MODULES=$(NAG_PATH)/nagfl90_modules/
-NAG_LIBS=$(NAG_PATH)/lib
-includes = -I$(NAG_MODULES)  
-libs = $(NAG_LIBS)/libnagfl90_nag.a
+# when compiling for debugging
+#switch = -Og -g3 -Wall -Wextra -Wconversion -pedantic -fimplicit-none -fbounds-check -fbacktrace -ffree-line-length-none -ffpe-trap=zero,overflow,underflow -std=f2003
+
+# when compiling for production
+switch = -O3 -ffree-line-length-none
+
+# when compiling for profiling
+#switch = -O2 -ffree-line-length-none -g -pg -fno-omit-frame-pointer -fno-inline-functions -fno-inline-functions-called-once -fno-optimize-sibling-calls
+
+# List of includes for the compiler
+includes = -I/usr/include/
+
+# for the serial version
+#libs = -lfftw3 -lm
+
+# for the multi-threaded version
+libs = -lfftw3_threads -lfftw3 -lm -lpthread
 
 # Makefile
-filter_en.out: filter_en.o subroutines.o global.o ode_path.o nrtype.o
-	$(f90comp) -o filter_en.out $(switch) filter_en.o subroutines.o global.o ode_path.o nrtype.o $(libs)
-filter_en.o: subroutines.mod global.mod filter_en.f90
+filter_en.out: filter_en.o subroutines.o global.o ode_path.o nrtype.o FFTW3.o
+	$(f90comp) -o filter_en.out $(switch) filter_en.o subroutines.o global.o ode_path.o nrtype.o FFTW3.o $(libs)
+filter_en.o: subroutines.mod global.mod filter_en.f90 FFTW3.mod
 	$(f90comp) -c $(switch) filter_en.f90 $(includes)
 
 filter_mom.out: filter_mom.o subroutines.o global.o ode_path.o nrtype.o
@@ -21,14 +31,14 @@ filter_mom.out: filter_mom.o subroutines.o global.o ode_path.o nrtype.o
 filter_mom.o: subroutines.mod global.mod filter_mom.f90
 	$(f90comp) -c $(switch) filter_mom.f90 $(includes)
 
-RK_OPO_sp.out: RK_OPO_sp.o subroutines.o rk_adaptive.o global.o ode_path.o nrtype.o
-	$(f90comp) -o RK_OPO_sp.out $(switch) RK_OPO_sp.o subroutines.o rk_adaptive.o global.o ode_path.o nrtype.o $(libs)
-RK_OPO_sp.o: subroutines.mod rk_adaptive.mod global.mod RK_OPO_sp.f90
+RK_OPO_sp.out: RK_OPO_sp.o subroutines.o rk_adaptive.o FFTW3.o global.o ode_path.o nrtype.o
+	$(f90comp) -o RK_OPO_sp.out $(switch) RK_OPO_sp.o subroutines.o rk_adaptive.o FFTW3.o global.o ode_path.o nrtype.o $(libs)
+RK_OPO_sp.o: subroutines.mod rk_adaptive.mod FFTW3.mod global.mod RK_OPO_sp.f90
 	$(f90comp) -c $(switch) RK_OPO_sp.f90 $(includes)
 
-RK_OPO_rk.out: RK_OPO_rk.o subroutines.o rk_adaptive.o global.o ode_path.o nrtype.o
-	$(f90comp) -o RK_OPO_rk.out $(switch) RK_OPO_rk.o subroutines.o rk_adaptive.o global.o ode_path.o nrtype.o $(libs)
-RK_OPO_rk.o: subroutines.mod rk_adaptive.mod global.mod RK_OPO_rk.f90
+RK_OPO_rk.out: RK_OPO_rk.o subroutines.o rk_adaptive.o FFTW3.o global.o ode_path.o nrtype.o
+	$(f90comp) -o RK_OPO_rk.out $(switch) RK_OPO_rk.o subroutines.o rk_adaptive.o FFTW3.o global.o ode_path.o nrtype.o $(libs)
+RK_OPO_rk.o: subroutines.mod rk_adaptive.mod FFTW3.mod global.mod RK_OPO_rk.f90
 	$(f90comp) -c $(switch) RK_OPO_rk.f90 $(includes)
 subroutines.mod: subroutines.o subroutines.f90
 	$(f90comp) -c $(switch) subroutines.f90
@@ -36,7 +46,7 @@ subroutines.o: global.mod subroutines.f90
 	$(f90comp) -c $(switch) subroutines.f90
 rk_adaptive.mod: rk_adaptive.o rk_adaptive.f90
 	$(f90comp) -c $(switch) rk_adaptive.f90 $(includes)
-rk_adaptive.o: global.mod rk_adaptive.f90
+rk_adaptive.o: global.mod FFTW3.mod rk_adaptive.f90
 	$(f90comp) -c $(switch) rk_adaptive.f90 $(includes)
 global.mod: global.o global.f90
 	$(f90comp) -c $(switch) global.f90
@@ -50,6 +60,10 @@ nrtype.mod: nrtype.o nrtype.f90
 	$(f90comp) -c $(switch) nrtype.f90
 nrtype.o: nrtype.f90
 	$(f90comp) -c $(switch) nrtype.f90
+FFTW3.mod: FFTW3.o FFTW3.f90
+	$(f90comp) -c $(switch) FFTW3.f90 $(includes)
+FFTW3.o: FFTW3.f90
+	$(f90comp) -c $(switch) FFTW3.f90 $(includes)
 
 # Cleaning everything
 clean:
