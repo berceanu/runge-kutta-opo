@@ -45,7 +45,9 @@
         x2_r=tot_h
         h1_r=0.001
         hmin_r=0.0
+        write(*,*) "integrating spectrum.."
         CALL odeint_sp(pdb,x1_r,x2_r,eps_r,h1_r,hmin_r)
+        write(*,*) "integrated spectrum"
 
         dimx=size(y_tot_0,1)
         dimy=size(y_tot_0,2)
@@ -70,10 +72,13 @@
         y_tot_0 = out_forward/sqrt(real(dimx*dimy*dimt, dp))
 
         !save time evolution to file for integrating later in energy window
+        write(*,*) "exporting evolution.."
         call export_evolution
+        write(*,*) "exported evolution."
 
         !calculate the energy spectrum
         call eval_spectr_0
+        write(*,*) "calculated spectrum."
 
         close(file_time_0)
 
